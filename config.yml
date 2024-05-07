@@ -1,0 +1,9 @@
+# 日志目录和BUG关键词，path为绝对路径
+fil:
+  url: 'https://api.node.glif.io/rpc/v0'
+  debug: false
+logfile:
+  - api: 'api/public/UploadImage'
+    path: './logs/miner-last-500000.log'
+    keyword: ['上传成功','上传失败']
+
