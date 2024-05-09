@@ -6,8 +6,11 @@ package lib
 
 import (
 	"bufio"
+	"fmt"
 	"io"
+	"log"
 	"strings"
+	"time"
 )
 
 // 匹配关键词
@@ -81,28 +84,51 @@ func ReadNewBlockFromLine(content string) (map[string]interface{}, error) {
 }
 
 // 分析一个日志文件
-func Analysis(file string, keywords []string) (map[string]int, error) {
-	//文件操作
-	var text []byte
-	// 打开文件
-	fs, err := Open(file)
-	if err != nil {
-		return nil, err
-	}
-	defer fs.Close()
-	buf := bufio.NewReader(fs) // 读文件缓冲区
+func AnalysisLog(logPath string) {
+	diffTime := time.Now().UnixNano()
+	defer func() {
+		// 显示程序执行效率
+		diffTime = (time.Now().UnixNano() - diffTime) / 1e6
+		fmt.Printf("程序共执行 %v ms \n", diffTime)
+	}()
 
-	ret := make(map[string]int)
-	//fmt.Print(ret)
-	for io.EOF != err {
-		text, _, err = buf.ReadLine() // 读一行
-		boo, kwd := LogAnalysis(string(text), keywords)
-		if boo {
-			ret[kwd]++
+	FilInit()
+	// 读配置文件
+	config := GetConfig()
+	//fmt.Printf("%v\n\n", config)
+
+	date := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
+	fmt.Printf("处理的日期为：%v \n", date)
+
+	for _, fileLogs := range config.Logfile {
+		if len(logPath) > 0 {
+			fileLogs.Path = logPath
 		}
+		blocks, err := ReadNewBlocksFromLog(fileLogs.Path)
+		if err != nil {
+			log.Printf("err:%v", err)
+			return
+		}
+		log.Printf("start filter invalid block...")
+		forkedNum := 0
+		for _, block := range blocks {
+			_, err := GetBlock(block["cid"].(string))
+			if err != nil {
+				if strings.Contains(err.Error(), "ipld: could not find") {
+					forkedNum++
+					fmt.Printf("fored block time:%s, cid:%s, height:%f, took:%f \n", block["time"], block["cid"], block["height"], block["took"])
+				} else {
+					log.Printf("err:%v", err)
+				}
+			}
+		}
+
+		totalNum := len(blocks)
+		forkedRate := float64(0)
+		if totalNum > 0 {
+			forkedRate = float64(forkedNum) / float64(totalNum) * 100
+		}
+
+		log.Printf("total number:%d, forked number:%d, forked rate is %.3f%s", totalNum, forkedNum, forkedRate, "%")
 	}
-	if len(ret) == 0 {
-		return nil, nil
-	}
-	return ret, nil
 }
