@@ -16,6 +16,12 @@ var (
 // 主程序
 func main() {
 	diffTime := time.Now().UnixNano()
+	defer func() {
+		// 显示程序执行效率
+		diffTime = (time.Now().UnixNano() - diffTime) / 1e6
+		fmt.Printf("程序共执行 %v ms \n", diffTime)
+	}()
+
 	lib.FilInit()
 	// 读配置文件
 	config := lib.GetConfig()
@@ -47,13 +53,15 @@ func main() {
 			}
 		}
 
-		log.Printf("forked rate is %v%s", float64(forkedNum)/float64(len(blocks))*100, "%")
+		totalNum := len(blocks)
+		forkedRate := float64(0)
+		if totalNum > 0 {
+			forkedRate = float64(forkedNum) / float64(totalNum) * 100
+		}
+
+		log.Printf("total number:%d, forked number:%d, forked rate is %.3f%s", totalNum, forkedNum, forkedRate, "%")
 	}
 	// 发送邮件,耗时2秒多
 	//libs.SendToMail(config.Mailto, "<h1>"+date+" BUG数汇总</h1><div>今日总bug数有"+strconv.Itoa(bug_num)+"个，请在 http://bugs.xxxxx.com/list?date="+date+" 中查看。</div>")
-
-	// 显示程序执行效率
-	diffTime = (time.Now().UnixNano() - diffTime) / 1e6
-	fmt.Printf("程序共执行 %v ms \n", diffTime)
 
 }
