@@ -16,6 +16,7 @@ func ApiInit() {
 	walletClient = fil_rpc.Client{BaseURL: conf.Fil.Url, Debug: conf.Fil.Debug}
 }
 
+// AV#TWVpT2!FjWYXm
 func GetBlock(cid string) (*gjson.Result, error) {
 	callMsg := map[string]interface{}{
 		"/": cid,

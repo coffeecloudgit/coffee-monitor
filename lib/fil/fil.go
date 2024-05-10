@@ -10,6 +10,7 @@ import (
 )
 
 func GetLotusInfo() (*LotusInfo, error) {
+	ApiInit()
 	conf := config.GetConfig()
 	chainHead, err := GetChainHead()
 	if err != nil {
