@@ -1,6 +1,6 @@
 // 获取可执行文件的绝对路径
 
-package lib
+package config
 
 import (
 	"os"

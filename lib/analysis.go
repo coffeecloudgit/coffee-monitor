@@ -6,6 +6,8 @@ package lib
 
 import (
 	"bufio"
+	config2 "coffee-monitor/lib/config"
+	"coffee-monitor/lib/fil"
 	"fmt"
 	"io"
 	"log"
@@ -92,9 +94,9 @@ func AnalysisLog(logPath string) {
 		fmt.Printf("程序共执行 %v ms \n", diffTime)
 	}()
 
-	FilInit()
+	fil.ApiInit()
 	// 读配置文件
-	config := GetConfig()
+	config := config2.GetConfig()
 	//fmt.Printf("%v\n\n", config)
 
 	date := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
@@ -112,7 +114,7 @@ func AnalysisLog(logPath string) {
 		log.Printf("start filter invalid block...")
 		forkedNum := 0
 		for _, block := range blocks {
-			_, err := GetBlock(block["cid"].(string))
+			_, err := fil.GetBlock(block["cid"].(string))
 			if err != nil {
 				if strings.Contains(err.Error(), "ipld: could not find") {
 					forkedNum++

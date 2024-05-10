@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"coffee-monitor/lib"
 	"fmt"
 	"github.com/spf13/cobra"
 	"os"
@@ -11,8 +12,8 @@ var rootCmd = &cobra.Command{
 	Short: "coffee-cli is a FIL monitor tool",
 	Long:  `coffee-cli is a FIL monitor tool`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("run coffee-cli...")
-		//lib.AnalysisLog()
+		fmt.Println("run timer...")
+		lib.Snapshot()
 	},
 }
 

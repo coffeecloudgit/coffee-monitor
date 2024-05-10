@@ -3,14 +3,22 @@ package client
 import (
 	"flag"
 	"log"
+	"sync"
 	"time"
 )
 
 var clientAddr = flag.String("addr", "ws://127.0.0.1:8083/echo", "http service address")
+var wsClient *Wsc = nil
+var connectLck sync.Mutex
 
-var wsClient *Wsc
+func ConnectServer() {
+	connectLck.Lock()
+	defer connectLck.Unlock()
 
-func Connect() {
+	if wsClient != nil {
+		return
+	}
+
 	flag.Parse()
 	log.SetFlags(0)
 
@@ -58,9 +66,9 @@ func Connect() {
 		log.Println("OnClose: ", code, text)
 		done <- true
 	})
-	wsClient.OnTextMessageSent(func(message string) {
-		log.Println("OnTextMessageSent: ", message)
-	})
+	//wsClient.OnTextMessageSent(func(message string) {
+	//	//log.Println("OnTextMessageSent: ", message)
+	//})
 	wsClient.OnBinaryMessageSent(func(data []byte) {
 		log.Println("OnBinaryMessageSent: ", string(data))
 	})
@@ -87,8 +95,13 @@ func Connect() {
 			return
 		}
 	}
+
 }
 
-func sendData(channel string, data []byte) {
+func SendData(message string) error {
+	if wsClient == nil {
+		ConnectServer()
+	}
 
+	return wsClient.SendTextMessage(message)
 }

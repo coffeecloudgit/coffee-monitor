@@ -15,3 +15,5 @@
 *.iws
 .idea/
 .idea/
+coffee-cli
+coffee-monitor

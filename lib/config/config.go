@@ -1,7 +1,7 @@
 // BUG日志分析库文件
 // 配置文件操作核心代码
 // 配置的读取和修改，配置文件为.yml格式
-package lib
+package config
 
 import (
 	"fmt"
@@ -21,8 +21,9 @@ type Conf struct {
 	} `yaml:"logfile"`
 	Db  map[string]string `yaml:"db"`
 	Fil struct {
-		Url   string
-		Debug bool
+		Url     string
+		Debug   bool
+		Account string
 	} `yaml:"fil"`
 }
 
