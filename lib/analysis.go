@@ -118,8 +118,8 @@ func AnalysisLog(logPath string) {
 			if err != nil {
 				if strings.Contains(err.Error(), "ipld: could not find") {
 					forkedNum++
-					fmt.Printf("fored block time:%s, cid:%s, height:%f, took:%f, paretns:%v \n",
-						block["time"], block["cid"], block["height"], block["took"], block["paretns"])
+					fmt.Printf("fored block time:%s, cid:%s, height:%f, took:%f, parents:%v \n",
+						block["time"], block["cid"], block["height"], block["took"], block["parents"])
 
 					//fmt.Printf("height:%f, paretns:%v => %v \n", block["height"], block["parents"], block["parents"])
 				} else {
