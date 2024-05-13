@@ -85,7 +85,7 @@ func ReadNewBlockFromLine(content string) (map[string]interface{}, error) {
 	return block, nil
 }
 
-// 分析一个日志文件
+// AnalysisLog 分析一个日志文件
 func AnalysisLog(logPath string) {
 	diffTime := time.Now().UnixNano()
 	defer func() {
@@ -118,7 +118,10 @@ func AnalysisLog(logPath string) {
 			if err != nil {
 				if strings.Contains(err.Error(), "ipld: could not find") {
 					forkedNum++
-					fmt.Printf("fored block time:%s, cid:%s, height:%f, took:%f \n", block["time"], block["cid"], block["height"], block["took"])
+					fmt.Printf("fored block time:%s, cid:%s, height:%f, took:%f, paretns:%v \n",
+						block["time"], block["cid"], block["height"], block["took"], block["paretns"])
+
+					//fmt.Printf("height:%f, paretns:%v => %v \n", block["height"], block["parents"], block["parents"])
 				} else {
 					log.Printf("err:%v", err)
 				}

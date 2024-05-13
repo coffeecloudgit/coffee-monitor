@@ -15,7 +15,7 @@ func TestReadNewBlockFromLine(t *testing.T) {
 }
 
 func TestReadNewBlocksFromLog(t *testing.T) {
-	file := "/Users/fangyu/GolandProjects/coffee-monitor/logs/miner.log"
+	file := "/Users/fangyu/GolandProjects/coffee-monitor/logs/miner-last-500000.log"
 	blocks, err := ReadNewBlocksFromLog(file)
 	if err != nil {
 		t.Errorf("err:%v", err)
@@ -25,4 +25,9 @@ func TestReadNewBlocksFromLog(t *testing.T) {
 	for _, block := range blocks {
 		t.Logf("block time:%s, cid:%s, height:%f, took:%f", block["time"], block["cid"], block["height"], block["took"])
 	}
+}
+
+func TestAnalysisLog(t *testing.T) {
+	file := "/Users/fangyu/GolandProjects/coffee-monitor/logs/miner-last-500000.log"
+	AnalysisLog(file)
 }
