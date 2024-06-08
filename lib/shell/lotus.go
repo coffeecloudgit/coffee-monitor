@@ -18,12 +18,13 @@ func LotusSyncCheck() error {
 		return err
 	}
 
-	outString := string(out)
+	outString := strings.TrimSpace(string(out))
 	if strings.HasSuffix(outString, "Done!") {
 		log.Println("节点检测正常")
 		return nil
 	}
-	fmt.Println("out string is:", outString)
+	fmt.Println("out string is:")
+	fmt.Println(outString)
 	fmt.Println("节点同步异常，需要添加内部节点！")
 	return LotusNetAddPeer()
 }
