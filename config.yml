@@ -7,4 +7,6 @@ logfile:
   - api: 'api/public/UploadImage'
     path: './logs/miner-last-500000.log'
     keyword: ['上传成功','上传失败']
+lotus:
+  nodes: ['','']
 

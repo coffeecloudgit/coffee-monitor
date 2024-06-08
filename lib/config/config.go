@@ -25,6 +25,9 @@ type Conf struct {
 		Debug   bool
 		Account string
 	} `yaml:"fil"`
+	Lotus struct {
+		Nodes []string
+	}
 }
 
 // 获取配置
