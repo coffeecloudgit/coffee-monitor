@@ -62,7 +62,7 @@ func LotusSyncCron() error {
 	_, err := c.AddFunc(spec, func() {
 		err := shell.LotusSyncCheck()
 		if err != nil {
-			return
+			log.Println(err)
 		}
 	})
 	if err != nil {

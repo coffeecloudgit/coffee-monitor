@@ -12,7 +12,8 @@ import (
 
 func LotusSyncCheck() error {
 	//cmd := exec.Command("ls")
-	out, err := exec.Command("timeout 36s lotus sync wait").Output()
+	log.Println("LotusSyncCheck start...")
+	out, err := exec.Command("bash", "-c", "timeout 36s lotus sync wait").Output()
 	if err != nil {
 		return err
 	}
@@ -37,7 +38,7 @@ func LotusNetAddPeer() error {
 	for _, node := range config.Lotus.Nodes {
 		cmd := fmt.Sprintf("timeout 36s lotus net connect %s", node)
 		log.Println("add node：", cmd)
-		out, err := exec.Command(cmd).Output()
+		out, err := exec.Command("bash", "-c", cmd).Output()
 		if err != nil {
 			return err
 		}
