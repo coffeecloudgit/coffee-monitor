@@ -23,7 +23,7 @@ func LotusSyncCheck() error {
 		log.Println("节点检测正常")
 		return nil
 	}
-
+	fmt.Println("out string is:", outString)
 	fmt.Println("节点同步异常，需要添加内部节点！")
 	return LotusNetAddPeer()
 }
