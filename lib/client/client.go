@@ -1,16 +1,24 @@
 package client
 
 import (
+	"encoding/json"
+	"errors"
 	"flag"
 	"log"
 	"sync"
 	"time"
 )
 
-var clientAddr = flag.String("addr", "ws://127.0.0.1:8083/echo", "http service address")
+var connectServerAddr = flag.String("addr", "ws://127.0.0.1:8083/echo", "http service address")
 var wsClient *Wsc = nil
 var connectLck sync.Mutex
 
+func DisConnectServer() {
+	if wsClient == nil {
+		return
+	}
+	wsClient.Close()
+}
 func ConnectServer() {
 	connectLck.Lock()
 	defer connectLck.Unlock()
@@ -23,7 +31,7 @@ func ConnectServer() {
 	log.SetFlags(0)
 
 	done := make(chan bool)
-	wsClient = NewWsClient(*clientAddr)
+	wsClient = NewWsClient(*connectServerAddr)
 	// 可自定义配置，不使用默认配置
 	//wsClient.SetConfig(&wsc.Config{
 	//	// 写超时
@@ -104,4 +112,16 @@ func SendData(message string) error {
 	}
 
 	return wsClient.SendTextMessage(message)
+}
+
+func SendMessage(message Message) error {
+	if wsClient == nil {
+		ConnectServer()
+	}
+	msgBytes, err := json.Marshal(message)
+	if err != nil {
+		return errors.New("message marshal fail")
+	}
+	log.Println(string(msgBytes))
+	return wsClient.SendTextMessage(string(msgBytes))
 }

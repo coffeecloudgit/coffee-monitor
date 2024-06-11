@@ -1,6 +1,7 @@
 package client
 
 import (
+	"encoding/json"
 	"flag"
 	"log"
 	"net/http"
@@ -33,12 +34,16 @@ func echo(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		log.Printf("recv: %s, type: %v", message, mt)
-		err = c.WriteMessage(mt, message)
-		if err != nil {
-			log.Println("write:", err)
-			break
-		}
+		log.Printf("recv: %s, type: %v \n", message, mt)
+		var msg Message
+		json.Unmarshal(message, &msg)
+
+		log.Printf("msg: %v", msg)
+		//err = c.WriteMessage(mt, message)
+		//if err != nil {
+		//	log.Println("write:", err)
+		//	break
+		//}
 	}
 }
 

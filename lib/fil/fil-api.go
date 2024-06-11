@@ -62,3 +62,11 @@ func NetAddrsListen() (*gjson.Result, error) {
 	}
 	return result, nil
 }
+
+func SyncState() (*gjson.Result, error) {
+	result, err := walletClient.Call("Filecoin.SyncState", nil)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}

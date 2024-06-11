@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"coffee-monitor/lib"
+	fil "coffee-monitor/lib/fil/miner"
 	"github.com/spf13/cobra"
 )
 
@@ -12,7 +12,7 @@ var checkLogCmd = &cobra.Command{
 	Short: "Analysis the miner log",
 	Long:  `Analysis the miner log,find forked block. example: coffee-monitor check`,
 	Run: func(cmd *cobra.Command, args []string) {
-		lib.AnalysisLog(checkLog)
+		fil.AnalysisLog(checkLog)
 	},
 }
 

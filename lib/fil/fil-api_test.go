@@ -39,7 +39,17 @@ func TestNetPeers(t *testing.T) {
 func TestGetTipSetByHeight(t *testing.T) {
 	got, err := GetTipSetByHeight(uint64(3905052))
 	if err != nil {
-		t.Errorf("GetBlock() error = %v", err)
+		t.Errorf("GetTipSetByHeight() error = %v", err)
+		return
+	}
+
+	log.Print(got)
+}
+
+func TestSyncState(t *testing.T) {
+	got, err := SyncState()
+	if err != nil {
+		t.Errorf("SyncState() error = %v", err)
 		return
 	}
 

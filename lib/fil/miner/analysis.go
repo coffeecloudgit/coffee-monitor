@@ -2,20 +2,24 @@
 // 日志分析引擎核心程序，分析并记录BUG
 // 使用正则匹配BUG关键词，并提取BUG内容/BUG数据汇总等
 
-package lib
+package fil
 
 import (
 	"bufio"
+	"coffee-monitor/lib/client"
 	config2 "coffee-monitor/lib/config"
 	"coffee-monitor/lib/fil"
+	"coffee-monitor/lib/util"
+	"errors"
 	"fmt"
+	"github.com/hpcloud/tail"
 	"io"
 	"log"
 	"strings"
 	"time"
 )
 
-// 匹配关键词
+// LogAnalysis 匹配关键词
 func LogAnalysis(str string, keyword []string) (bool, string) {
 	for _, v := range keyword {
 		if strings.Contains(str, v) {
@@ -37,7 +41,7 @@ func ReadNewBlocksFromLog(file string) ([]map[string]interface{}, error) {
 	//文件操作
 	var text []byte
 	// 打开文件
-	fs, err := Open(file)
+	fs, err := util.Open(file)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +80,7 @@ func ReadNewBlockFromLine(content string) (map[string]interface{}, error) {
 	timeString := content[:timeIndex]
 	jsonString := content[jsonIndex+15:]
 
-	block, err := ParseJson(jsonString)
+	block, err := util.ParseJson(jsonString)
 
 	if err != nil {
 		return nil, err
@@ -136,4 +140,43 @@ func AnalysisLog(logPath string) {
 
 		log.Printf("total number:%d, forked number:%d, forked rate is %.3f%s", totalNum, forkedNum, forkedRate, "%")
 	}
+}
+
+/*
+*
+{"cid": "bafy2bzacecfv66423q22ciwve56jevpco7czuo2cldvfxqntq2zhm4sqwuoq6",
+"height": 3888596,
+"miner": "f02246008",
+"parents": ["f02245898","f01757676","f01366743","f02941888","f01082888","f01084913","f02830476","f01923787","f01964002","f02003555","f02182907"],
+"parentTipset": "{bafy2bzacedwdd6yur65buylz4536lhslwgljac6qmhbchf7f5hrlep7nwcf7m,bafy2bzaceacgnqni5rkbwgih7op6jr4zrythirm7h6rtetfnwxvdvo6iuc2os,bafy2bzaceb6btfwsuir3v7dgg64o3k723hfpdpepasc2vyzv4wplfgvtnhcd6,bafy2bzacea2tembbq7lj2osemaqisfr6cfet3gdg5tp6umkurzsti57suyq62,bafy2bzacebesgd7svgzwd6gqska5iw336tykhcv7ycmgsdb2cwqt7rs7ruhrs,bafy2bzacedvjaxacnfnngnc7xayus6wxw6ia3x2ngmrsbvyrxb2syq3jfnl5g,bafy2bzaceauvqhtkhu5myv6mwopt4nmvqq6d4uionexr7noqjqmnaxsat6mga,bafy2bzaceco6uvj52zgjzly4gj367vdjr54w22maipj2cuaeslipfzv72qc7a,bafy2bzacec4kzmo5aaoj37eqiyqjvpb4vmzf6oxsqzm32uudkduywl4r4vwkc,bafy2bzacec2dypzdmmgdzcryenickihx57giv4atng6s3rd26vy2bp4wflusi,bafy2bzacedn6ouurmcipctfsfgifzbjgztdmx7eikyoyt4v3dl7kyggrmdeac}",
+"took": 1.874394829}
+*/
+
+func MinerLogTailProcessor() error {
+	go client.ConnectServer()
+	config := config2.GetConfig()
+	if len(config.Logfile) == 0 {
+		return errors.New("miner logfile is empty")
+	}
+	t, err := tail.TailFile(config.Logfile[0].Path, tail.Config{Follow: true})
+
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	for line := range t.Lines {
+		fmt.Println(line.Text)
+		block, err2 := ReadNewBlockFromLine(line.Text)
+
+		if err2 != nil {
+			return err2
+		}
+
+		if block != nil {
+			msg := client.Message{Type: client.NEW_BLOCK, Data: block}
+
+			return client.SendMessage(msg)
+		}
+	}
+	return nil
 }

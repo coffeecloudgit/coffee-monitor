@@ -1,4 +1,4 @@
-package lib
+package util
 
 import (
 	"encoding/json"
@@ -24,4 +24,9 @@ func ParseJson(jsonString string) (map[string]interface{}, error) {
 	data := v.(map[string]interface{})
 
 	return data, nil
+}
+
+func JsonToString(data interface{}) (string, error) {
+	jsonData, err := json.Marshal(data)
+	return string(jsonData), err
 }

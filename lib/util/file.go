@@ -2,7 +2,7 @@
 // 文件操作核心代码
 // 日志文件的读取操作
 
-package lib
+package util
 
 import (
 	"os"
