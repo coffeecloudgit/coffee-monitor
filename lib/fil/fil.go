@@ -11,7 +11,7 @@ import (
 
 func GetLotusInfo() (*LotusInfo, error) {
 	ApiInit()
-	conf := config.GetConfig()
+	conf := config.CONF
 	chainHead, err := GetChainHead()
 	if err != nil {
 		return nil, err

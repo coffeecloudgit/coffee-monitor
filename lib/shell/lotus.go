@@ -12,7 +12,7 @@ import (
 
 func LotusSyncCheck() error {
 	//cmd := exec.Command("ls")
-	log.Println("LotusSyncCheck start...")
+	//log.Println("LotusSyncCheck start...")
 	out, err := exec.Command("bash", "-c", "timeout 36s lotus sync wait").Output()
 	if err != nil {
 		return err
@@ -30,7 +30,7 @@ func LotusSyncCheck() error {
 }
 
 func LotusNetAddPeer() error {
-	config := config2.GetConfig()
+	config := config2.CONF
 
 	if len(config.Lotus.Nodes) <= 0 {
 		return errors.New("config lotus nodes is null")

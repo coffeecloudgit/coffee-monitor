@@ -9,7 +9,7 @@ import (
 var walletClient = fil_rpc.Client{BaseURL: "https://api.node.glif.io/rpc/v0", Debug: true}
 
 func ApiInit() {
-	conf := config.GetConfig()
+	conf := config.CONF
 	if len(conf.Fil.Url) == 0 {
 		panic("error config fil")
 	}

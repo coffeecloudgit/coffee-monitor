@@ -100,7 +100,7 @@ func AnalysisLog(logPath string) {
 
 	fil.ApiInit()
 	// 读配置文件
-	config := config2.GetConfig()
+	config := config2.CONF
 	//fmt.Printf("%v\n\n", config)
 
 	date := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
@@ -154,7 +154,7 @@ func AnalysisLog(logPath string) {
 
 func MinerLogTailProcessor() error {
 	go client.ConnectServer()
-	config := config2.GetConfig()
+	config := config2.CONF
 	if len(config.Logfile) == 0 {
 		return errors.New("miner logfile is empty")
 	}

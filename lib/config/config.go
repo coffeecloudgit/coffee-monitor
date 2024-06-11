@@ -10,6 +10,12 @@ import (
 	"log"
 )
 
+var CONF *Conf
+
+func init() {
+	CONF = GetConfig()
+}
+
 // 配置结构
 type Conf struct {
 	Mailto  []string          `yaml:"mailto"`
@@ -21,9 +27,10 @@ type Conf struct {
 	} `yaml:"logfile"`
 	Db  map[string]string `yaml:"db"`
 	Fil struct {
-		Url     string
-		Debug   bool
-		Account string
+		Url       string `yaml:"url"`
+		Debug     bool   `yaml:"debug"`
+		Account   string `yaml:"account"`
+		MsgServer string `yaml:"msg_server"`
 	} `yaml:"fil"`
 	Lotus struct {
 		Nodes []string

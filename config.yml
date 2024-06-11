@@ -3,6 +3,7 @@ fil:
   url: 'https://api.node.glif.io/rpc/v0'
   debug: false
   account: 'f02246008'
+  msg_server: 'ws://127.0.0.1:8083/echo'
 logfile:
   - api: 'api/public/UploadImage'
     path: './logs/miner-last-500000.log'

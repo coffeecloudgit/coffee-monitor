@@ -1,6 +1,7 @@
 package client
 
 import (
+	"coffee-monitor/lib/config"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -9,7 +10,7 @@ import (
 	"time"
 )
 
-var connectServerAddr = flag.String("addr", "ws://127.0.0.1:8083/echo", "http service address")
+var connectServerAddr = flag.String("addr", config.CONF.Fil.MsgServer, "http service address")
 var wsClient *Wsc = nil
 var connectLck sync.Mutex
 
