@@ -2,8 +2,6 @@ package cmd
 
 import (
 	"coffee-monitor/lib"
-	"coffee-monitor/lib/client"
-	fil "coffee-monitor/lib/fil/miner"
 	"fmt"
 	"github.com/spf13/cobra"
 	"log"
@@ -18,14 +16,14 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("run timer...")
 		log.Println("connect server...")
-		go client.ConnectServer()
+		//go client.ConnectServer()
 		log.Println("connect server sleep 2s...")
 		time.Sleep(2000 * time.Millisecond)
 		lib.Snapshot()
-		err := fil.MinerLogTailProcessor()
-		if err != nil {
-			fmt.Println(err)
-		}
+		//err := fil.MinerLogTailProcessor()
+		//if err != nil {
+		//	fmt.Println(err)
+		//}
 	},
 }
 
