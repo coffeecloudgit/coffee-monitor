@@ -17,12 +17,12 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		//run test wss server
 		if client.IsConnectLocalhostServer() {
-			fmt.Println("run test wss server")
+			log.Println("run test wss server")
 			go client.RunTestServer()
 			time.Sleep(5000 * time.Millisecond)
 		}
 
-		fmt.Println("run timer...")
+		log.Println("run timer...")
 		log.Println("connect server...")
 		go client.ConnectServer()
 		log.Println("connect server sleep 2s...")

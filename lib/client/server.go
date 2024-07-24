@@ -34,18 +34,24 @@ func echo(w http.ResponseWriter, r *http.Request) {
 			log.Println("read:", err)
 			break
 		}
+		if string(message) == "hello" {
+			log.Println("connected check ...")
+			err = c.WriteMessage(mt, message)
+			if err != nil {
+				log.Println("write:", err)
+				break
+			}
+		} else {
+			log.Printf("recv: aaa|%s|bb, type: %v \n", message, mt)
+			var msg *Message
+			json.Unmarshal(message, msg)
 
-		log.Printf("recv: %s, type: %v \n", message, mt)
-		var msg *Message
-		json.Unmarshal(message, msg)
+			log.Printf("msg: %v", msg)
 
-		log.Printf("msg: %v", msg)
-
-		if msg == nil {
-			return
+			if msg != nil {
+				processMsg(msg)
+			}
 		}
-
-		processMsg(msg)
 	}
 }
 
@@ -56,6 +62,8 @@ func processMsg(msg *Message) {
 	case NewBlock:
 	case OrphanBlock:
 	case LotusMinerInfo:
+	case NewMineOne:
+
 	default:
 		fmt.Println("未知消息：", msg)
 	}

@@ -3,6 +3,7 @@ package client
 type MsgType string
 
 const (
+	NewMineOne     MsgType = "new-mine-one"
 	NewBlock       MsgType = "new-block"
 	OrphanBlock    MsgType = "orphan-block"
 	WARNING        MsgType = "warning"

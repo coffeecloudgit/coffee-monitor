@@ -53,7 +53,7 @@ func ReadNewBlocksFromLog(file string) ([]map[string]interface{}, error) {
 	for io.EOF != err {
 		text, _, err = buf.ReadLine() // 读一行
 		if err == nil {
-			block, err2 := ReadNewBlockFromLine(string(text))
+			block, _, err2 := ReadNewBlockAndMineOneFromLine(string(text))
 
 			if err2 != nil {
 				return nil, err2
@@ -67,26 +67,47 @@ func ReadNewBlocksFromLog(file string) ([]map[string]interface{}, error) {
 	return ret, nil
 }
 
-func ReadNewBlockFromLine(content string) (map[string]interface{}, error) {
-	var jsonIndex = strings.Index(content, "mined new block")
-	if jsonIndex == -1 {
-		return nil, nil
+func ReadNewBlockAndMineOneFromLine(content string) (map[string]interface{}, map[string]interface{}, error) {
+	//2024-07-23T18:32:40.022+0800    INFO    miner   miner/miner.go:505      completed mineOne       {"tookMilliseconds": 10, "forRound": 4114146, "baseEpoch": 4114145, "baseDeltaSeconds": 10, "nullRounds": 0, "lateStart": false, "beaconEpoch": 9642462, "lookbackEpochs": 900, "networkPowerAtLookback": "26141019317397585920", "minerPowerAtLookback": "11157637840240640", "isEligible": true, "isWinner": false, "error": null}
+	var timeIndex = strings.Index(content, "\tINFO\tminer")
+	var timeString string
+	var mineOne map[string]interface{}
+	var err error
+	var minerJsonIndex = strings.Index(content, "completed mineOne")
+	if minerJsonIndex > -1 {
+		minerJsonString := content[minerJsonIndex+17:]
+		mineOne, err = util.ParseJson(minerJsonString)
+		if err != nil {
+			fmt.Println(err.Error())
+			mineOne = nil
+		}
+
+		if err == nil && mineOne != nil {
+			if timeIndex > -1 {
+				timeString = content[:timeIndex]
+				mineOne["time"] = timeString
+			}
+		}
 	}
 
-	var timeIndex = strings.Index(content, "\tINFO\tminer")
-	if timeIndex == -1 {
-		return nil, nil
+	var jsonIndex = strings.Index(content, "mined new block")
+	if jsonIndex == -1 {
+		return nil, mineOne, nil
 	}
-	timeString := content[:timeIndex]
+
+	if timeIndex == -1 {
+		return nil, mineOne, nil
+	}
+	timeString = content[:timeIndex]
 	jsonString := content[jsonIndex+15:]
 
 	block, err := util.ParseJson(jsonString)
 
 	if err != nil {
-		return nil, err
+		return nil, mineOne, err
 	}
 	block["time"] = timeString
-	return block, nil
+	return block, mineOne, nil
 }
 
 // AnalysisLog 分析一个日志文件
@@ -182,8 +203,30 @@ func MinerLogTailProcessor() error {
 		return err
 	}
 	for line := range t.Lines {
-		//fmt.Println(line.Text)
-		block, err2 := ReadNewBlockFromLine(line.Text)
+		fmt.Println(line.Text)
+		block, mineOne, err2 := ReadNewBlockAndMineOneFromLine(line.Text)
+
+		if mineOne != nil {
+			mineOneTime := mineOne["time"]
+			myTime, err3 := util.StringToTime(mineOneTime.(string))
+
+			if err3 != nil {
+				log.Println(err3)
+			}
+			if err3 == nil {
+				//log.Println(myTime)
+				secondSub := time.Now().Unix() - myTime.Unix()
+
+				if secondSub < 300 {
+					mine := make(map[string]interface{}, 5)
+					mine["epoch"] = mineOne["baseEpoch"]
+					mine["miner"] = config.Fil.Account
+					msg := client.Message{Type: client.NewMineOne, Data: mine}
+					client.SendMessage(msg)
+				}
+			}
+
+		}
 
 		if err2 != nil {
 			fmt.Println(err2)

@@ -44,3 +44,6 @@ Workers: Seal(77) WdPoSt(1) WinPoSt(0)
 ```
 
 new-block
+
+
+2024-07-23T18:32:40.022+0800    INFO    miner   miner/miner.go:505      completed mineOne       {"tookMilliseconds": 10, "forRound": 4114146, "baseEpoch": 4114145, "baseDeltaSeconds": 10, "nullRounds": 0, "lateStart": false, "beaconEpoch": 9642462, "lookbackEpochs": 900, "networkPowerAtLookback": "26141019317397585920", "minerPowerAtLookback": "11157637840240640", "isEligible": true, "isWinner": false, "error": null}
