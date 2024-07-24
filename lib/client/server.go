@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var serverAddr = flag.String("server", "localhost:8083", "http service address")
+var serverAddr = flag.String("server", "0.0.0.0:8083", "http service address")
 
 var upGrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
@@ -42,7 +42,7 @@ func echo(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 		} else {
-			log.Printf("recv: aaa|%s|bb, type: %v \n", message, mt)
+			//log.Printf("recv: aaa|%s|bb, type: %v \n", message, mt)
 			var msg *Message
 			json.Unmarshal(message, msg)
 

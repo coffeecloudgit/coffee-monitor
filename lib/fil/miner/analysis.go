@@ -203,7 +203,7 @@ func MinerLogTailProcessor() error {
 		return err
 	}
 	for line := range t.Lines {
-		fmt.Println(line.Text)
+		//log.Println(line.Text)
 		block, mineOne, err2 := ReadNewBlockAndMineOneFromLine(line.Text)
 
 		if mineOne != nil {
