@@ -4,7 +4,7 @@ Enabled subsystems: [Mining Sealing SectorStorage]
 StartTime: 314h41m30s (started at 2024-07-10 07:52:23 +0800 CST)
 Chain: [sync ok] [basefee 100 aFIL]
 ⚠ 1 Active alerts (check lotus-miner log alerts)
-Miner: f03148950 (32 GiB sectors)
+Miner: f05xx8960 (32 GiB sectors)
 Power: 9.91 Pi / 22.7 Ei (0.0427%)
         Raw: 1015 TiB / 5.662 EiB (0.0171%)
         Committed: 1.063 PiB
