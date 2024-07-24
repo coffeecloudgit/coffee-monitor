@@ -151,6 +151,15 @@ func AnalysisLog(logPath string) {
 "parentTipset": "{bafy2bzacedwdd6yur65buylz4536lhslwgljac6qmhbchf7f5hrlep7nwcf7m,bafy2bzaceacgnqni5rkbwgih7op6jr4zrythirm7h6rtetfnwxvdvo6iuc2os,bafy2bzaceb6btfwsuir3v7dgg64o3k723hfpdpepasc2vyzv4wplfgvtnhcd6,bafy2bzacea2tembbq7lj2osemaqisfr6cfet3gdg5tp6umkurzsti57suyq62,bafy2bzacebesgd7svgzwd6gqska5iw336tykhcv7ycmgsdb2cwqt7rs7ruhrs,bafy2bzacedvjaxacnfnngnc7xayus6wxw6ia3x2ngmrsbvyrxb2syq3jfnl5g,bafy2bzaceauvqhtkhu5myv6mwopt4nmvqq6d4uionexr7noqjqmnaxsat6mga,bafy2bzaceco6uvj52zgjzly4gj367vdjr54w22maipj2cuaeslipfzv72qc7a,bafy2bzacec4kzmo5aaoj37eqiyqjvpb4vmzf6oxsqzm32uudkduywl4r4vwkc,bafy2bzacec2dypzdmmgdzcryenickihx57giv4atng6s3rd26vy2bp4wflusi,bafy2bzacedn6ouurmcipctfsfgifzbjgztdmx7eikyoyt4v3dl7kyggrmdeac}",
 "took": 1.874394829}
 */
+//var blockQueue = util.Queue{
+//	Content: []util.Object{},
+//	Timeout: 0,
+//	MaxSize: 60,
+//}
+
+var blockQueue = make(map[string]map[string]interface{}, 5)
+
+//var blockQueueLock sync.Mutex
 
 func MinerLogTailProcessor() error {
 	go client.ConnectServer()
@@ -158,25 +167,91 @@ func MinerLogTailProcessor() error {
 	if len(config.Logfile) == 0 {
 		return errors.New("miner logfile is empty")
 	}
-	t, err := tail.TailFile(config.Logfile[0].Path, tail.Config{Follow: true})
+	//t, err := tail.TailFile(config.Logfile[0].Path, tail.Config{Follow: true})
+
+	t, err := tail.TailFile(config.Logfile[0].Path, tail.Config{
+		ReOpen:    true,                                               //是否重新打开
+		Follow:    true,                                               //是否跟随
+		Location:  &tail.SeekInfo{Offset: -10000, Whence: io.SeekEnd}, //从文件的什么地方开始读
+		MustExist: false,                                              //文件不存在不报错
+		Poll:      false,
+	})
 
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 	for line := range t.Lines {
-		fmt.Println(line.Text)
+		//fmt.Println(line.Text)
 		block, err2 := ReadNewBlockFromLine(line.Text)
 
 		if err2 != nil {
-			return err2
+			fmt.Println(err2)
+			continue
 		}
 
 		if block != nil {
-			msg := client.Message{Type: client.NEW_BLOCK, Data: block}
-
-			return client.SendMessage(msg)
+			msg := client.Message{Type: client.NewBlock, Data: block}
+			cid := block["cid"].(string)
+			if cid == "" {
+				continue
+			}
+			//blockQueueLock.Lock()
+			//blockQueue = append(blockQueue, block)
+			blockQueue[cid] = block
+			//blockQueueLock.Unlock()
+			//blockQueue.Put(block)
+			client.SendMessage(msg)
 		}
 	}
 	return nil
+}
+
+func CheckOrphanBlock() {
+
+	var deleteKeys = make([]string, 0)
+	if len(blockQueue) <= 0 {
+		return
+	}
+	info, err := fil.GetLotusInfo()
+	if err != nil {
+		log.Printf(err.Error())
+		return
+	}
+	fmt.Println("start check orphan block, len:", len(blockQueue), ",height:", info.Height)
+	for cid, block := range blockQueue {
+		height, err2 := util.InterfaceToUnit64(block["height"])
+		if err2 != nil {
+			log.Printf(err2.Error())
+			continue
+		}
+
+		if (info.Height - height) < 30 { //30个确认后判断孤块
+			continue
+		}
+
+		if (info.Height - height) > 2000 { //2000个确认后不能判断孤块，直接删除
+			deleteKeys = append(deleteKeys, cid)
+			continue
+		}
+
+		_, err := fil.GetBlock(cid)
+		if err == nil {
+			deleteKeys = append(deleteKeys, cid)
+			continue
+		}
+		if strings.Contains(err.Error(), "ipld: could not find") { //orphan
+			fmt.Printf("fored block time:%s, cid:%s, height:%f, took:%f, parents:%v \n",
+				block["time"], block["cid"], block["height"], block["took"], block["parents"])
+			deleteKeys = append(deleteKeys, cid)
+			msg := client.Message{Type: client.OrphanBlock, Data: block}
+			client.SendMessage(msg)
+		} else {
+			log.Printf("err:%v, %v", err, block)
+		}
+	}
+
+	for _, v := range deleteKeys {
+		delete(blockQueue, v)
+	}
 }

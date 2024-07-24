@@ -37,6 +37,9 @@ func LotusNetAddPeer() error {
 	}
 
 	for _, node := range config.Lotus.Nodes {
+		if len(node) <= 0 {
+			continue
+		}
 		cmd := fmt.Sprintf("timeout 36s lotus net connect %s", node)
 		log.Println("add node：", cmd)
 		out, err := exec.Command("bash", "-c", cmd).Output()
@@ -47,6 +50,14 @@ func LotusNetAddPeer() error {
 		time.Sleep(5000 * time.Millisecond)
 	}
 	return nil
+}
+
+func LotusMinerInfo() (error, string) {
+	out, err := exec.Command("bash", "-c", "timeout 36s lotus-miner info").Output()
+	if err != nil {
+		return err, ""
+	}
+	return nil, string(out)
 }
 
 //try:

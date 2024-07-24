@@ -1,8 +1,10 @@
 package lib
 
 import (
-	"coffee-monitor/lib/fil"
+	"coffee-monitor/lib/client"
+	fil "coffee-monitor/lib/fil/miner"
 	"coffee-monitor/lib/shell"
+	"fmt"
 	"github.com/robfig/cron/v3"
 	"log"
 )
@@ -17,17 +19,20 @@ func Snapshot() {
 	//	log.Fatal(err)
 	//	return
 	//}
+	//1.檢測lotus同步狀態
+	go lotusCheck()
 
-	err := LotusSyncCron()
+	//2.檢測lotus-miner info 並發送給server
+	go lotusMinerInfoCheck()
+
+	//3.监控miner日志发送块、孤块信息
+	err := fil.MinerLogTailProcessor()
 	if err != nil {
-		log.Println(err)
-		return
+		fmt.Println(err)
 	}
 
-	//2.监控miner日志发送孤块信息
-
-	//3.监控miner数据并发送至服务端
-
+	//4.监控miner孤块信息
+	go OrphanCheck()
 }
 
 // 返回一个支持至 秒 级别的 cron
@@ -37,15 +42,54 @@ func newWithSeconds() *cron.Cron {
 	return cron.New(cron.WithParser(secondParser), cron.WithChain())
 }
 
-func LotusInfoCron() error {
-	log.Printf("start LotusInfoCron 0 */1 * * * ?")
+//func LotusInfoCron() error {
+//	log.Printf("start LotusInfoCron 0 */1 * * * ?")
+//	c := newWithSeconds()
+//	spec := "0 */1 * * * ?" //一分钟运行一次
+//	_, err := c.AddFunc(spec, func() {
+//		err := fil.SendLotusInfo()
+//		if err != nil {
+//			return
+//		}
+//	})
+//	if err != nil {
+//		return err
+//	}
+//	c.Start()
+//	select {}
+//
+//}
+
+func lotusCheck() {
+	err := LotusSyncCron()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+}
+
+func lotusMinerInfoCheck() {
+	err := LotusMinerInfoCron()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+}
+
+func OrphanCheck() {
+	err := OrphanCheckCron()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+}
+
+func OrphanCheckCron() error {
+	log.Printf("start LotusSyncCron 0 */3 * * * ?")
 	c := newWithSeconds()
-	spec := "0 */1 * * * ?" //一分钟运行一次
+	spec := "0 */3 * * * ?" //一分钟运行一次
 	_, err := c.AddFunc(spec, func() {
-		err := fil.SendLotusInfo()
-		if err != nil {
-			return
-		}
+		fil.CheckOrphanBlock()
 	})
 	if err != nil {
 		return err
@@ -64,6 +108,34 @@ func LotusSyncCron() error {
 		if err != nil {
 			log.Println(err)
 		}
+	})
+	if err != nil {
+		return err
+	}
+	c.Start()
+	select {}
+
+}
+
+func LotusMinerInfoCron() error {
+	log.Printf("start LotusMinerInfoCron 0 */2 * * * ?")
+	c := newWithSeconds()
+	spec := "0 */2 * * * ?" //一分钟运行一次
+	_, err := c.AddFunc(spec, func() {
+		err, result := shell.LotusMinerInfo()
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		msg := client.Message{Type: client.LotusMinerInfo, Content: result}
+
+		//time.Sleep(2000 * time.Millisecond)
+		err2 := client.SendMessage(msg)
+		if err2 != nil {
+			log.Println(err)
+			return
+		}
+
 	})
 	if err != nil {
 		return err

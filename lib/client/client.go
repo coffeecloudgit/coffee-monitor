@@ -6,6 +6,7 @@ import (
 	"errors"
 	"flag"
 	"log"
+	"strings"
 	"sync"
 	"time"
 )
@@ -19,6 +20,13 @@ func DisConnectServer() {
 		return
 	}
 	wsClient.Close()
+}
+
+func IsConnectLocalhostServer() bool {
+	if strings.Contains(*connectServerAddr, "127.0.0.1:8083") || strings.Contains(*connectServerAddr, "localhost:8083") {
+		return true
+	}
+	return false
 }
 func ConnectServer() {
 	connectLck.Lock()
@@ -53,7 +61,7 @@ func ConnectServer() {
 		log.Println("OnConnected: ", wsClient.WebSocket.Url)
 		// 连接成功后，测试每10秒发送消息
 		go func() {
-			t := time.NewTicker(10 * time.Second)
+			t := time.NewTicker(20 * time.Second)
 			for {
 				select {
 				case <-t.C:

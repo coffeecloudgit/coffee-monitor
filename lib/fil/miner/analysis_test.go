@@ -31,3 +31,7 @@ func TestAnalysisLog(t *testing.T) {
 	file := "/Users/fangyu/GolandProjects/coffee-monitor/logs/miner-last-500000.log"
 	AnalysisLog(file)
 }
+
+func TestAnalysisTailLog(t *testing.T) {
+	MinerLogTailProcessor()
+}

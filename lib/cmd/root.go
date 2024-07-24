@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"coffee-monitor/lib"
+	"coffee-monitor/lib/client"
 	"fmt"
 	"github.com/spf13/cobra"
 	"log"
@@ -14,16 +15,20 @@ var rootCmd = &cobra.Command{
 	Short: "coffee-cli is a FIL monitor tool",
 	Long:  `coffee-cli is a FIL monitor tool`,
 	Run: func(cmd *cobra.Command, args []string) {
+		//run test wss server
+		if client.IsConnectLocalhostServer() {
+			fmt.Println("run test wss server")
+			go client.RunTestServer()
+			time.Sleep(5000 * time.Millisecond)
+		}
+
 		fmt.Println("run timer...")
 		log.Println("connect server...")
-		//go client.ConnectServer()
+		go client.ConnectServer()
 		log.Println("connect server sleep 2s...")
 		time.Sleep(2000 * time.Millisecond)
+		//监控相关
 		lib.Snapshot()
-		//err := fil.MinerLogTailProcessor()
-		//if err != nil {
-		//	fmt.Println(err)
-		//}
 	},
 }
 

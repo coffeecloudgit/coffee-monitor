@@ -6,7 +6,7 @@ fil:
   msg_server: 'ws://127.0.0.1:8083/echo'
 logfile:
   - api: 'api/public/UploadImage'
-    path: './logs/miner-last-500000.log'
+    path: '/Users/ym/mm.log'
     keyword: ['上传成功','上传失败']
 lotus:
   nodes: ['','']

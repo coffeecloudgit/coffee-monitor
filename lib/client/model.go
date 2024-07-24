@@ -3,9 +3,10 @@ package client
 type MsgType string
 
 const (
-	NEW_BLOCK    MsgType = "new_block"
-	ORPHAN_BLOCK MsgType = "orphan_block"
-	WARNING      MsgType = "warning"
+	NewBlock       MsgType = "new-block"
+	OrphanBlock    MsgType = "orphan-block"
+	WARNING        MsgType = "warning"
+	LotusMinerInfo MsgType = "lotus-miner-info"
 )
 
 type Message struct {
