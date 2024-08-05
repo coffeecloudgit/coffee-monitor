@@ -39,7 +39,7 @@ func Snapshot() {
 func Lotus() {
 	//1.檢測lotus同步狀態
 	go lotusCheck()
-
+	select {}
 }
 
 // 返回一个支持至 秒 级别的 cron
