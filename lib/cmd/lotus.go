@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"coffee-monitor/lib"
 	"coffee-monitor/lib/fil"
 	"github.com/spf13/cobra"
 	"log"
@@ -17,6 +18,8 @@ var lotusCmd = &cobra.Command{
 		}
 
 		log.Println(lotusInfo)
+
+		lib.Lotus()
 	},
 }
 

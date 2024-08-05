@@ -35,6 +35,13 @@ func Snapshot() {
 	go OrphanCheck()
 }
 
+// Snapshot 快照一次
+func Lotus() {
+	//1.檢測lotus同步狀態
+	go lotusCheck()
+
+}
+
 // 返回一个支持至 秒 级别的 cron
 func newWithSeconds() *cron.Cron {
 	secondParser := cron.NewParser(cron.Second | cron.Minute |
