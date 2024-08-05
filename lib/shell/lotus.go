@@ -18,6 +18,7 @@ func LotusSyncCheck() error {
 		log.Println(err.Error())
 		return err
 	}
+	///
 
 	if err != nil {
 		log.Println("sync 超時......")
