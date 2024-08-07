@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+var execTimes = 0
+
 func LotusSyncCheck() error {
 	//cmd := exec.Command("ls")
 	//log.Println("LotusSyncCheck start...")
@@ -26,7 +28,10 @@ func LotusSyncCheck() error {
 
 	outString := strings.TrimSpace(string(out))
 	if strings.HasSuffix(outString, "Done!") {
-		//log.Println("节点检测正常")
+		if execTimes%8 == 0 {
+			log.Println("节点检测正常")
+		}
+		execTimes++
 		return nil
 	}
 	fmt.Println("out string is:")
