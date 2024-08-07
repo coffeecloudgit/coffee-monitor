@@ -26,7 +26,7 @@ func LotusSyncCheck() error {
 
 	outString := strings.TrimSpace(string(out))
 	if strings.HasSuffix(outString, "Done!") {
-		log.Println("节点检测正常")
+		//log.Println("节点检测正常")
 		return nil
 	}
 	fmt.Println("out string is:")
@@ -46,7 +46,7 @@ func LotusNetAddPeer() error {
 		if len(node) <= 0 {
 			continue
 		}
-		cmd := fmt.Sprintf("timeout 36s lotus net connect %s", node)
+		cmd := fmt.Sprintf("timeout 12s lotus net connect %s", node)
 		log.Println("add node：", cmd)
 		out, err := exec.Command("bash", "-c", cmd).Output()
 		if err != nil {
