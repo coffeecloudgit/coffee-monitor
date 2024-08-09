@@ -15,7 +15,7 @@ var execTimes = 0
 func LotusSyncCheck() error {
 	//cmd := exec.Command("ls")
 	//log.Println("LotusSyncCheck start...")
-	out, err := exec.Command("bash", "-c", "timeout 15s lotus sync wait").Output()
+	out, err := exec.Command("bash", "-c", "timeout 20s lotus sync wait").Output()
 	if err != nil && !strings.Contains(err.Error(), "exit status 124") {
 		log.Println(err.Error())
 		return err

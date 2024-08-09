@@ -107,10 +107,10 @@ func OrphanCheckCron() error {
 }
 
 func LotusSyncCron() error {
-	log.Printf("@every 15s")
+	log.Printf("@every 20s")
 	c := newWithSeconds()
 	//spec := "0 */1 * * * ?" //一分钟运行一次
-	spec := "@every 15s"
+	spec := "@every 20s"
 	_, err := c.AddFunc(spec, func() {
 		err := shell.LotusSyncCheck()
 		if err != nil {
