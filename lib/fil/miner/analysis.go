@@ -16,6 +16,7 @@ import (
 	"github.com/hpcloud/tail"
 	"io"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -96,7 +97,7 @@ func ReadNewMineOneFromLine(content string) (map[string]interface{}, error) {
 		return nil, nil
 	}
 	epoch := mineOne["baseEpoch"]
-	mineOne["baseEpoch"] = fmt.Sprintf("%f", epoch)
+	mineOne["baseEpoch"] = strconv.FormatFloat(epoch.(float64), 'f', 0, 64) //fmt.Sprintf("%f", epoch)
 	return mineOne, nil
 }
 
