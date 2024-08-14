@@ -9,6 +9,7 @@ import (
 	"coffee-monitor/lib/client"
 	config2 "coffee-monitor/lib/config"
 	"coffee-monitor/lib/fil"
+	"coffee-monitor/lib/shell"
 	"coffee-monitor/lib/util"
 	"errors"
 	"fmt"
@@ -53,7 +54,7 @@ func ReadNewBlocksFromLog(file string) ([]map[string]interface{}, error) {
 	for io.EOF != err {
 		text, _, err = buf.ReadLine() // 读一行
 		if err == nil {
-			block, _, err2 := ReadNewBlockAndMineOneFromLine(string(text))
+			block, err2 := ReadNewBlockFromLine(string(text))
 
 			if err2 != nil {
 				return nil, err2
@@ -67,7 +68,7 @@ func ReadNewBlocksFromLog(file string) ([]map[string]interface{}, error) {
 	return ret, nil
 }
 
-func ReadNewBlockAndMineOneFromLine(content string) (map[string]interface{}, map[string]interface{}, error) {
+func ReadNewMineOneFromLine(content string) (map[string]interface{}, error) {
 	//2024-07-23T18:32:40.022+0800    INFO    miner   miner/miner.go:505      completed mineOne       {"tookMilliseconds": 10, "forRound": 4114146, "baseEpoch": 4114145, "baseDeltaSeconds": 10, "nullRounds": 0, "lateStart": false, "beaconEpoch": 9642462, "lookbackEpochs": 900, "networkPowerAtLookback": "26141019317397585920", "minerPowerAtLookback": "11157637840240640", "isEligible": true, "isWinner": false, "error": null}
 	var timeIndex = strings.Index(content, "\tINFO\tminer")
 	var timeString string
@@ -90,13 +91,27 @@ func ReadNewBlockAndMineOneFromLine(content string) (map[string]interface{}, map
 		}
 	}
 
+	if timeIndex == -1 {
+		return mineOne, nil
+	}
+	timeString = content[:timeIndex]
+
+	return mineOne, nil
+}
+
+func ReadNewBlockFromLine(content string) (map[string]interface{}, error) {
+	//2024-07-23T18:32:40.022+0800    INFO    miner   miner/miner.go:505      completed mineOne       {"tookMilliseconds": 10, "forRound": 4114146, "baseEpoch": 4114145, "baseDeltaSeconds": 10, "nullRounds": 0, "lateStart": false, "beaconEpoch": 9642462, "lookbackEpochs": 900, "networkPowerAtLookback": "26141019317397585920", "minerPowerAtLookback": "11157637840240640", "isEligible": true, "isWinner": false, "error": null}
+	var timeIndex = strings.Index(content, "\tINFO\tminer")
+	var timeString string
+	var err error
+
 	var jsonIndex = strings.Index(content, "mined new block")
 	if jsonIndex == -1 {
-		return nil, mineOne, nil
+		return nil, nil
 	}
 
 	if timeIndex == -1 {
-		return nil, mineOne, nil
+		return nil, nil
 	}
 	timeString = content[:timeIndex]
 	jsonString := content[jsonIndex+15:]
@@ -104,10 +119,12 @@ func ReadNewBlockAndMineOneFromLine(content string) (map[string]interface{}, map
 	block, err := util.ParseJson(jsonString)
 
 	if err != nil {
-		return nil, mineOne, err
+		return nil, err
 	}
 	block["time"] = timeString
-	return block, mineOne, nil
+	block["reward"] = ""
+
+	return block, nil
 }
 
 // AnalysisLog 分析一个日志文件
@@ -204,7 +221,7 @@ func MinerLogTailProcessor() error {
 	}
 	for line := range t.Lines {
 		//log.Println(line.Text)
-		block, mineOne, err2 := ReadNewBlockAndMineOneFromLine(line.Text)
+		mineOne, _ := ReadNewMineOneFromLine(line.Text)
 
 		if mineOne != nil {
 			mineOneTime := mineOne["time"]
@@ -227,18 +244,18 @@ func MinerLogTailProcessor() error {
 			}
 
 		}
-
-		if err2 != nil {
-			fmt.Println(err2)
-			continue
-		}
-
+		block, _ := ReadNewBlockFromLine(line.Text)
 		if block != nil {
 			msg := client.Message{Type: client.NewBlock, Data: block}
 			cid := block["cid"].(string)
 			if cid == "" {
 				continue
 			}
+			err2, reward := shell.LotusMinerInfoGetRewardForBlock(cid)
+			if err2 != nil {
+				fmt.Println(err2.Error())
+			}
+			block["reward"] = reward
 			//blockQueueLock.Lock()
 			//blockQueue = append(blockQueue, block)
 			blockQueue[cid] = block

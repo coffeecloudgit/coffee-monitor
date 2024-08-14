@@ -71,6 +71,23 @@ func LotusMinerInfo() (error, string) {
 	return nil, string(out)
 }
 
+// 獲取對應區塊獎勵
+func LotusMinerInfoGetRewardForBlock(blockId string) (error, string) {
+	cmd := fmt.Sprintf("timeout 36s lotus-miner info --blocks 2 |grep %s", blockId)
+	out, err := exec.Command("bash", "-c", cmd).Output()
+	if err != nil {
+		return err, "0 FIL"
+	}
+	result := string(out)
+	resultArray := strings.Split(result, "|")
+
+	if len(resultArray) == 3 {
+		return nil, strings.TrimSpace(resultArray[2])
+	}
+
+	return fmt.Errorf("error out: %s", result), "0 FIL"
+}
+
 //try:
 //out = sp.getoutput("timeout 36s lotus sync wait")
 //print("chain_check:")
