@@ -43,14 +43,17 @@ func echo(w http.ResponseWriter, r *http.Request) {
 			}
 		} else {
 			//log.Printf("recv: aaa|%s|bb, type: %v \n", message, mt)
-			var msg *Message
-			json.Unmarshal(message, msg)
+			//{"type":"new-mine-one","content":"","data":{"epoch":3888596,"miner":"f02246008"}}
+			var msg Message
+			err2 := json.Unmarshal(message, &msg)
 
 			log.Printf("msg: %v", msg)
 
-			if msg != nil {
-				processMsg(msg)
+			if err2 != nil {
+				log.Println(err2)
+				continue
 			}
+			processMsg(&msg)
 		}
 	}
 }

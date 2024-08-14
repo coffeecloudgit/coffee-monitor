@@ -105,7 +105,7 @@ func ConnectServer() {
 		log.Println("OnBinaryMessageReceived: ", string(data))
 	})
 	// 开始连接
-	go wsClient.Connect()
+	wsClient.Connect()
 	for {
 		select {
 		case <-done:
