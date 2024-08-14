@@ -12,7 +12,7 @@ func TestConnect(t *testing.T) {
 }
 
 func TestSendNewMineOne(t *testing.T) {
-	jsonString := "{\"epoch\": 3888596, \"miner\": \"f02246008\"}"
+	jsonString := "{\"epoch\": \"3888596\", \"miner\": \"f02246008\"}"
 	mineOne, err := util.ParseJson(jsonString)
 
 	msg := Message{Type: NewMineOne, Data: mineOne}
