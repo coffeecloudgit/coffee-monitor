@@ -94,8 +94,8 @@ func ReadNewMineOneFromLine(content string) (map[string]interface{}, error) {
 	if timeIndex == -1 {
 		return mineOne, nil
 	}
-	timeString = content[:timeIndex]
-
+	epoch := mineOne["epoch"]
+	mineOne["epoch"] = fmt.Sprintf("%d", epoch)
 	return mineOne, nil
 }
 
