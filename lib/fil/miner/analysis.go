@@ -75,24 +75,25 @@ func ReadNewMineOneFromLine(content string) (map[string]interface{}, error) {
 	var mineOne map[string]interface{}
 	var err error
 	var minerJsonIndex = strings.Index(content, "completed mineOne")
-	if minerJsonIndex > -1 {
-		minerJsonString := content[minerJsonIndex+17:]
-		mineOne, err = util.ParseJson(minerJsonString)
-		if err != nil {
-			fmt.Println(err.Error())
-			mineOne = nil
-		}
 
-		if err == nil && mineOne != nil {
-			if timeIndex > -1 {
-				timeString = content[:timeIndex]
-				mineOne["time"] = timeString
-			}
-		}
+	if minerJsonIndex == -1 {
+		return nil, nil
+	}
+
+	minerJsonString := content[minerJsonIndex+17:]
+	mineOne, err = util.ParseJson(minerJsonString)
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil, err
+	}
+
+	if timeIndex > -1 {
+		timeString = content[:timeIndex]
+		mineOne["time"] = timeString
 	}
 
 	if timeIndex == -1 {
-		return mineOne, nil
+		return nil, nil
 	}
 	epoch := mineOne["epoch"]
 	mineOne["epoch"] = fmt.Sprintf("%d", epoch)
