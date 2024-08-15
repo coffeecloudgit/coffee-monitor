@@ -248,22 +248,20 @@ func MinerLogTailProcessor() error {
 		}
 		block, _ := ReadNewBlockFromLine(line.Text)
 		if block != nil {
-			msg := client.Message{Type: client.NewBlock, Data: block}
+			//msg := client.Message{Type: client.NewBlock, Data: block}
 			cid := block["cid"].(string)
 			if cid == "" {
 				continue
 			}
-			err2, reward := shell.LotusMinerInfoGetRewardForBlock(cid)
-			if err2 != nil {
-				fmt.Println(err2.Error())
-			}
-			block["reward"] = reward
-			//blockQueueLock.Lock()
-			//blockQueue = append(blockQueue, block)
+			//err2, reward := shell.LotusMinerInfoGetRewardForBlock(cid)
+			//if err2 != nil {
+			//	fmt.Println(err2.Error())
+			//}
+			//block["reward"] = reward
+			//client.SendMessage(msg)
+			block["send"] = false
 			blockQueue[cid] = block
-			//blockQueueLock.Unlock()
-			//blockQueue.Put(block)
-			client.SendMessage(msg)
+
 		}
 	}
 	return nil
@@ -290,6 +288,19 @@ func CheckOrphanBlock() {
 
 		if (info.Height - height) < 30 { //30个确认后判断孤块
 			continue
+		}
+
+		//一次确认后发送出块信息
+		if (info.Height-height) > 1 && !block["send"].(bool) {
+			err3, reward := shell.LotusMinerInfoGetRewardForBlock(cid)
+			if err3 != nil {
+				log.Logger.Error(err3.Error())
+			}
+			block["reward"] = reward
+			msg := client.Message{Type: client.NewBlock, Data: block}
+			client.SendMessage(msg)
+
+			block["send"] = true
 		}
 
 		if (info.Height - height) > 2000 { //2000个确认后不能判断孤块，直接删除

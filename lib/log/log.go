@@ -22,7 +22,8 @@ func init() {
 
 	Log = log.New(os.Stdout, "CC:", log.Ldate|log.Ltime|log.Lshortfile)
 
-	h0 := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: new(slog.LevelVar)})
+	h0 := slog.NewTextHandler(os.Stdout,
+		&slog.HandlerOptions{Level: new(slog.LevelVar), AddSource: true})
 
 	Logger = slog.New(h0)
 

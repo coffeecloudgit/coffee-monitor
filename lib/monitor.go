@@ -2,6 +2,7 @@ package lib
 
 import (
 	"coffee-monitor/lib/client"
+	config2 "coffee-monitor/lib/config"
 	fil "coffee-monitor/lib/fil/miner"
 	"coffee-monitor/lib/log"
 	"coffee-monitor/lib/shell"
@@ -92,9 +93,9 @@ func OrphanCheck() {
 }
 
 func OrphanCheckCron() error {
-	log.Logger.Info("start LotusSyncCron 0 */3 * * * ?")
+	log.Logger.Info("start LotusSyncCron 0 */1 * * * ?")
 	c := newWithSeconds()
-	spec := "0 */3 * * * ?" //一分钟运行一次
+	spec := "0 */1 * * * ?" //一分钟运行一次
 	_, err := c.AddFunc(spec, func() {
 		fil.CheckOrphanBlock()
 	})
@@ -135,7 +136,10 @@ func LotusMinerInfoCron() error {
 			log.Logger.Info(err.Error())
 			return
 		}
-		msg := client.Message{Type: client.LotusMinerInfo, Content: result}
+		mine := make(map[string]interface{}, 5)
+		mine["miner"] = config2.CONF.Fil.Account
+
+		msg := client.Message{Type: client.LotusMinerInfo, Content: result, Data: mine}
 
 		//time.Sleep(2000 * time.Millisecond)
 		err2 := client.SendMessage(msg)
