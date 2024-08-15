@@ -2,10 +2,10 @@ package client
 
 import (
 	"coffee-monitor/lib/config"
+	"coffee-monitor/lib/log"
 	"encoding/json"
 	"errors"
 	"flag"
-	"log"
 	"strings"
 	"sync"
 	"time"
@@ -37,7 +37,7 @@ func ConnectServer() {
 	}
 
 	flag.Parse()
-	log.SetFlags(0)
+	//log.Logger.SetFlags(0)
 
 	done := make(chan bool)
 	wsClient = NewWsClient(*connectServerAddr)
@@ -58,7 +58,7 @@ func ConnectServer() {
 	//})
 	// 设置回调处理
 	wsClient.OnConnected(func() {
-		log.Println("OnConnected: ", wsClient.WebSocket.Url)
+		log.Logger.Info("OnConnected: ", wsClient.WebSocket.Url)
 		// 连接成功后，测试每10秒发送消息
 		go func() {
 			t := time.NewTicker(20 * time.Second)
@@ -74,35 +74,35 @@ func ConnectServer() {
 		}()
 	})
 	wsClient.OnConnectError(func(err error) {
-		log.Println("OnConnectError: ", err.Error())
+		log.Logger.Info("OnConnectError: ", err.Error())
 	})
 	wsClient.OnDisconnected(func(err error) {
-		log.Println("OnDisconnected: ", err.Error())
+		log.Logger.Info("OnDisconnected: ", err.Error())
 	})
 	wsClient.OnClose(func(code int, text string) {
-		log.Println("OnClose: ", code, text)
+		log.Logger.Info("OnClose: ", code, text)
 		done <- true
 	})
 	//wsClient.OnTextMessageSent(func(message string) {
-	//	//log.Println("OnTextMessageSent: ", message)
+	//	//log.Logger.Info("OnTextMessageSent: ", message)
 	//})
 	wsClient.OnBinaryMessageSent(func(data []byte) {
-		log.Println("OnBinaryMessageSent: ", string(data))
+		log.Logger.Info("OnBinaryMessageSent: ", string(data))
 	})
 	wsClient.OnSentError(func(err error) {
-		log.Println("OnSentError: ", err.Error())
+		log.Logger.Info("OnSentError: ", err.Error())
 	})
 	wsClient.OnPingReceived(func(appData string) {
-		log.Println("OnPingReceived: ", appData)
+		log.Logger.Info("OnPingReceived: ", appData)
 	})
 	wsClient.OnPongReceived(func(appData string) {
-		log.Println("OnPongReceived: ", appData)
+		log.Logger.Info("OnPongReceived: ", appData)
 	})
 	wsClient.OnTextMessageReceived(func(message string) {
-		log.Println("OnTextMessageReceived: ", message)
+		log.Logger.Info("OnTextMessageReceived: ", message)
 	})
 	wsClient.OnBinaryMessageReceived(func(data []byte) {
-		log.Println("OnBinaryMessageReceived: ", string(data))
+		log.Logger.Info("OnBinaryMessageReceived: ", string(data))
 	})
 	// 开始连接
 	wsClient.Connect()
@@ -131,6 +131,6 @@ func SendMessage(message Message) error {
 	if err != nil {
 		return errors.New("message marshal fail")
 	}
-	log.Println(string(msgBytes))
+	log.Logger.Info(string(msgBytes))
 	return wsClient.SendTextMessage(string(msgBytes))
 }

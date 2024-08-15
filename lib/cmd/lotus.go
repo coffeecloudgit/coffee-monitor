@@ -3,8 +3,9 @@ package cmd
 import (
 	"coffee-monitor/lib"
 	"coffee-monitor/lib/fil"
+	"coffee-monitor/lib/log"
+	"fmt"
 	"github.com/spf13/cobra"
-	"log"
 )
 
 var lotusCmd = &cobra.Command{
@@ -14,10 +15,10 @@ var lotusCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		lotusInfo, err := fil.GetLotusInfo()
 		if err != nil {
-			log.Fatal(err)
+			log.Logger.Error(err.Error())
 		}
 
-		log.Println(lotusInfo)
+		fmt.Println(lotusInfo)
 
 		lib.Lotus()
 	},

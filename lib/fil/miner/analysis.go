@@ -9,13 +9,13 @@ import (
 	"coffee-monitor/lib/client"
 	config2 "coffee-monitor/lib/config"
 	"coffee-monitor/lib/fil"
+	"coffee-monitor/lib/log"
 	"coffee-monitor/lib/shell"
 	"coffee-monitor/lib/util"
 	"errors"
 	"fmt"
 	"github.com/hpcloud/tail"
 	"io"
-	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -152,10 +152,10 @@ func AnalysisLog(logPath string) {
 		}
 		blocks, err := ReadNewBlocksFromLog(fileLogs.Path)
 		if err != nil {
-			log.Printf("err:%v", err)
+			log.Logger.Info("err:%v", err)
 			return
 		}
-		log.Printf("start filter invalid block...")
+		log.Logger.Info("start filter invalid block...")
 		forkedNum := 0
 		for _, block := range blocks {
 			_, err := fil.GetBlock(block["cid"].(string))
@@ -167,7 +167,7 @@ func AnalysisLog(logPath string) {
 
 					//fmt.Printf("height:%f, paretns:%v => %v \n", block["height"], block["parents"], block["parents"])
 				} else {
-					log.Printf("err:%v", err)
+					log.Logger.Info("err:%v", err)
 				}
 			}
 		}
@@ -178,7 +178,7 @@ func AnalysisLog(logPath string) {
 			forkedRate = float64(forkedNum) / float64(totalNum) * 100
 		}
 
-		log.Printf("total number:%d, forked number:%d, forked rate is %.3f%s", totalNum, forkedNum, forkedRate, "%")
+		log.Logger.Info("total number:%d, forked number:%d, forked rate is %.3f%s", totalNum, forkedNum, forkedRate, "%")
 	}
 }
 
@@ -218,11 +218,11 @@ func MinerLogTailProcessor() error {
 	})
 
 	if err != nil {
-		log.Println(err)
+		log.Logger.Info(err.Error())
 		return err
 	}
 	for line := range t.Lines {
-		//log.Println(line.Text)
+		//log.Logger.Info(line.Text)
 		mineOne, _ := ReadNewMineOneFromLine(line.Text)
 
 		if mineOne != nil {
@@ -230,10 +230,10 @@ func MinerLogTailProcessor() error {
 			myTime, err3 := util.StringToTime(mineOneTime.(string))
 
 			if err3 != nil {
-				log.Println(err3)
+				log.Logger.Info(err3.Error())
 			}
 			if err3 == nil {
-				//log.Println(myTime)
+				//log.Logger.Info(myTime)
 				secondSub := time.Now().Unix() - myTime.Unix()
 
 				if secondSub < 300 {
@@ -277,14 +277,14 @@ func CheckOrphanBlock() {
 	}
 	info, err := fil.GetLotusInfo()
 	if err != nil {
-		log.Printf(err.Error())
+		log.Logger.Info(err.Error())
 		return
 	}
 	fmt.Println("start check orphan block, len:", len(blockQueue), ",height:", info.Height)
 	for cid, block := range blockQueue {
 		height, err2 := util.InterfaceToUnit64(block["height"])
 		if err2 != nil {
-			log.Printf(err2.Error())
+			log.Logger.Info(err2.Error())
 			continue
 		}
 
@@ -309,7 +309,7 @@ func CheckOrphanBlock() {
 			msg := client.Message{Type: client.OrphanBlock, Data: block}
 			client.SendMessage(msg)
 		} else {
-			log.Printf("err:%v, %v", err, block)
+			log.Logger.Info("err:%v, %v", err, block)
 		}
 	}
 

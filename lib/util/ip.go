@@ -1,7 +1,7 @@
 package util
 
 import (
-	"log"
+	"coffee-monitor/lib/log"
 	"net"
 	"os"
 )
@@ -10,7 +10,7 @@ func GetLocalIP() string {
 	addresses, err := net.InterfaceAddrs()
 
 	if err != nil {
-		log.Println(err)
+		log.Logger.Info(err.Error())
 		os.Exit(1)
 		return "127.0.0.1"
 	}

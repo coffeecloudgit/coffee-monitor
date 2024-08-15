@@ -1,7 +1,7 @@
 package fil
 
 import (
-	"log"
+	"coffee-monitor/lib/log"
 	"testing"
 )
 
@@ -29,7 +29,7 @@ func TestGetBlock(t *testing.T) {
 		return
 	}
 
-	log.Print(got)
+	log.Log.Println(got)
 }
 
 func TestGetChainNotify(t *testing.T) {
@@ -39,7 +39,7 @@ func TestGetChainNotify(t *testing.T) {
 		return
 	}
 
-	log.Print(got)
+	log.Log.Println(got)
 }
 
 func TestNetPeers(t *testing.T) {
@@ -49,7 +49,7 @@ func TestNetPeers(t *testing.T) {
 		return
 	}
 
-	log.Print(got)
+	log.Log.Println(got)
 }
 
 func TestGetTipSetByHeight(t *testing.T) {
@@ -59,7 +59,7 @@ func TestGetTipSetByHeight(t *testing.T) {
 		return
 	}
 
-	log.Print(got)
+	log.Log.Println(got)
 }
 
 func TestSyncState(t *testing.T) {
@@ -69,5 +69,5 @@ func TestSyncState(t *testing.T) {
 		return
 	}
 
-	log.Print(got)
+	log.Log.Println(got)
 }

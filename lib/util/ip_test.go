@@ -1,12 +1,12 @@
 package util
 
 import (
-	"log"
+	"coffee-monitor/lib/log"
 	"testing"
 )
 
 func TestGetLocalIP(t *testing.T) {
 	got := GetLocalIP()
 
-	log.Println(got)
+	log.Logger.Info(got)
 }

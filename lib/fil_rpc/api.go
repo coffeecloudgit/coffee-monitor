@@ -15,11 +15,11 @@
 package fil_rpc
 
 import (
+	"coffee-monitor/lib/log"
 	"errors"
 	"fmt"
 	"github.com/imroc/req"
 	"github.com/tidwall/gjson"
-	"log"
 )
 
 type Client struct {
@@ -44,7 +44,7 @@ func (c *Client) CallWithToken(accessToken, method string, params []interface{})
 	r, err := req.Post(c.BaseURL, req.BodyJSON(&body), authHeader)
 
 	if c.Debug {
-		log.Printf("%+v\n", r)
+		log.Logger.Info("%+v\n", r)
 	}
 
 	if err != nil {
@@ -74,13 +74,13 @@ func (c *Client) Call(method string, params []interface{}) (*gjson.Result, error
 	body["params"] = params
 
 	if c.Debug {
-		log.Printf("url : %+v, method : %+v, params : %+v", c.BaseURL, method, params)
+		log.Logger.Info("url : %+v, method : %+v, params : %+v", c.BaseURL, method, params)
 	}
 
 	r, err := req.Post(c.BaseURL, req.BodyJSON(&body), authHeader)
 
 	if c.Debug {
-		log.Printf("%+v\n", r)
+		log.Logger.Info("%+v\n", r)
 	}
 
 	if err != nil {

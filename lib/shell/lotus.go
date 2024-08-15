@@ -2,9 +2,9 @@ package shell
 
 import (
 	config2 "coffee-monitor/lib/config"
+	"coffee-monitor/lib/log"
 	"errors"
 	"fmt"
-	"log"
 	"os/exec"
 	"strings"
 	"time"
@@ -14,22 +14,22 @@ var execTimes = 0
 
 func LotusSyncCheck() error {
 	//cmd := exec.Command("ls")
-	//log.Println("LotusSyncCheck start...")
+	//log.Logger.Info("LotusSyncCheck start...")
 	out, err := exec.Command("bash", "-c", "timeout 20s lotus sync wait").Output()
 	if err != nil && !strings.Contains(err.Error(), "exit status 124") {
-		log.Println(err.Error())
+		log.Logger.Info(err.Error())
 		return err
 	}
 	///
 
 	if err != nil {
-		log.Println("sync 超時......")
+		log.Logger.Info("sync 超時......")
 	}
 
 	outString := strings.TrimSpace(string(out))
 	if strings.HasSuffix(outString, "Done!") {
 		if execTimes%8 == 0 {
-			log.Println("节点检测正常")
+			log.Logger.Info("节点检测正常")
 		}
 		execTimes++
 		return nil
@@ -52,12 +52,12 @@ func LotusNetAddPeer() error {
 			continue
 		}
 		cmd := fmt.Sprintf("timeout 12s lotus net connect %s", node)
-		log.Println("add node：", cmd)
+		log.Logger.Info("add node：", cmd)
 		out, err := exec.Command("bash", "-c", cmd).Output()
 		if err != nil {
 			return err
 		}
-		log.Println(out)
+		log.Logger.Info(string(out))
 		time.Sleep(5000 * time.Millisecond)
 	}
 	return nil

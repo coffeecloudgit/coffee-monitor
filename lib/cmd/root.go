@@ -3,9 +3,8 @@ package cmd
 import (
 	"coffee-monitor/lib"
 	"coffee-monitor/lib/client"
-	"fmt"
+	"coffee-monitor/lib/log"
 	"github.com/spf13/cobra"
-	"log"
 	"os"
 	"time"
 )
@@ -17,15 +16,16 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		//run test wss server
 		if client.IsConnectLocalhostServer() {
-			log.Println("run test wss server")
+			log.Logger.Info("run test wss server")
 			go client.RunTestServer()
 			time.Sleep(5000 * time.Millisecond)
 		}
 
-		log.Println("run timer...")
-		log.Println("connect server...")
+		log.Logger.Info("run timer...")
+
+		log.Logger.Info("connect server...")
 		go client.ConnectServer()
-		log.Println("connect server sleep 2s...")
+		log.Logger.Info("connect server sleep 2s...")
 		time.Sleep(2000 * time.Millisecond)
 		//监控相关
 		lib.Snapshot()
@@ -34,7 +34,7 @@ var rootCmd = &cobra.Command{
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
+		log.Logger.Info(err.Error())
 		os.Exit(1)
 	}
 }

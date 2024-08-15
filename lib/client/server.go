@@ -1,10 +1,10 @@
 package client
 
 import (
+	"coffee-monitor/lib/log"
 	"encoding/json"
 	"flag"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/gorilla/websocket"
@@ -24,33 +24,33 @@ var upGrader = websocket.Upgrader{
 func echo(w http.ResponseWriter, r *http.Request) {
 	c, err := upGrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Print("upgrade:", err)
+		log.Logger.Info("upgrade:", err)
 		return
 	}
 	defer c.Close()
 	for {
 		mt, message, err := c.ReadMessage()
 		if err != nil {
-			log.Println("read:", err)
+			log.Logger.Info("read:", err)
 			break
 		}
 		if string(message) == "hello" {
-			log.Println("connected check ...")
+			log.Logger.Info("connected check ...")
 			err = c.WriteMessage(mt, message)
 			if err != nil {
-				log.Println("write:", err)
+				log.Logger.Info("write:", err)
 				break
 			}
 		} else {
-			//log.Printf("recv: aaa|%s|bb, type: %v \n", message, mt)
+			//log.Logger.Info("recv: aaa|%s|bb, type: %v \n", message, mt)
 			//{"type":"new-mine-one","content":"","data":{"epoch":3888596,"miner":"f02246008"}}
 			var msg Message
 			err2 := json.Unmarshal(message, &msg)
 
-			log.Printf("msg: %v", msg)
+			log.Logger.Info("msg: %v", msg)
 
 			if err2 != nil {
-				log.Println(err2)
+				log.Logger.Info(err2.Error())
 				continue
 			}
 			processMsg(&msg)
@@ -78,10 +78,9 @@ func processMsg(msg *Message) {
 
 func RunTestServer() {
 	flag.Parse()
-	log.SetFlags(0)
 	http.HandleFunc("/echo", echo)
 	//http.HandleFunc("/", home)
-	log.Fatal(http.ListenAndServe(*serverAddr, nil))
+	http.ListenAndServe(*serverAddr, nil)
 }
 
 //

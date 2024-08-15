@@ -4,10 +4,10 @@
 package config
 
 import (
+	"coffee-monitor/lib/log"
 	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
-	"log"
 )
 
 var CONF *Conf
@@ -43,11 +43,11 @@ func GetConfig() *Conf {
 	yamlFile, err := ioutil.ReadFile(GetCurrentAbPathByCaller() + "/config.yml")
 	fmt.Printf("配置文件：%v \n", GetCurrentAbPathByCaller()+"/config.yml")
 	if err != nil {
-		log.Printf("yamlFile error !  -> %v", err)
+		log.Logger.Info("yamlFile error !  -> %v", err)
 	}
 	err = yaml.Unmarshal(yamlFile, c)
 	if err != nil {
-		log.Printf("yaml Unmarshal error !  -> %v", err)
+		log.Logger.Info("yaml Unmarshal error !  -> %v", err)
 	}
 	return c
 }
