@@ -282,7 +282,7 @@ func CheckOrphanBlock() {
 	log.Logger.Info("start check orphan block, len:",
 		slog.Int("queueLength", len(blockQueue)), slog.Uint64("height", info.Height))
 	for cid, block := range blockQueue {
-		height, err2 := util.InterfaceToUnit64(block["height"])
+		height, err2 := util.InterfaceToUint64(block["height"])
 		if err2 != nil {
 			log.Logger.Info(err2.Error())
 			continue
