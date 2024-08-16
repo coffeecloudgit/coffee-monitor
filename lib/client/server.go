@@ -7,11 +7,14 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strings"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
 
 var serverAddr = flag.String("server", "0.0.0.0:8083", "http service address")
+var ClientsChecks = make(map[string]int64, 2)
 
 var upGrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
@@ -22,12 +25,23 @@ var upGrader = websocket.Upgrader{
 	},
 } // use default options
 
+func IsOnline(miner string) bool {
+	if val, ok := ClientsChecks[miner]; ok {
+		if (time.Now().UnixMilli() - val) < 60000 {
+			return true
+		}
+	}
+
+	return false
+}
+
 func echo(w http.ResponseWriter, r *http.Request) {
 	c, err := upGrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Logger.Info("upgrade:", err)
 		return
 	}
+
 	defer c.Close()
 	for {
 		mt, message, err := c.ReadMessage()
@@ -35,25 +49,34 @@ func echo(w http.ResponseWriter, r *http.Request) {
 			log.Logger.Info("read:", err)
 			break
 		}
-		if string(message) == "hello" {
-			log.Logger.Info("connected check ...")
-			err = c.WriteMessage(mt, message)
+
+		stringMsg := string(message)
+		if !strings.HasPrefix(strings.TrimSpace(stringMsg), "{") {
+			log.Logger.Error("error msg", "msg", stringMsg)
+			continue
+		}
+
+		//log.Logger.Info("recv: aaa|%s|bb, type: %v \n", message, mt)
+		//{"type":"new-mine-one","content":"","data":{"epoch":3888596,"miner":"f02246008"}}
+		var msg Message
+		err2 := json.Unmarshal(message, &msg)
+		log.Logger.Info("msg:", slog.String("data", string(message)))
+		if err2 != nil {
+			log.Logger.Info(err2.Error())
+			continue
+		}
+
+		if msg.Type == Ping {
+			pongMsg := fmt.Sprintf("{\"type\":\"%s\", \"content\": \"%s\"}", Pong, msg.Content)
+			log.Logger.Debug("connected check ...")
+			err = c.WriteMessage(mt, []byte(pongMsg))
 			if err != nil {
-				log.Logger.Info("write:", err)
-				break
-			}
-		} else {
-			//log.Logger.Info("recv: aaa|%s|bb, type: %v \n", message, mt)
-			//{"type":"new-mine-one","content":"","data":{"epoch":3888596,"miner":"f02246008"}}
-			var msg Message
-			err2 := json.Unmarshal(message, &msg)
-
-			log.Logger.Info("msg:", slog.String("data", string(message)))
-
-			if err2 != nil {
-				log.Logger.Info(err2.Error())
+				log.Logger.Error("write:", "err:", err)
 				continue
 			}
+
+			ClientsChecks[msg.Content] = time.Now().UnixMilli()
+		} else {
 			processMsg(&msg)
 		}
 	}

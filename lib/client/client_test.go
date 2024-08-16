@@ -92,7 +92,7 @@ func TestSendLotusMinerInfo(t *testing.T) {
 	if err2 != nil {
 		return
 	}
-	time.Sleep(5000 * time.Millisecond)
+	time.Sleep(50000 * time.Millisecond)
 	DisConnectServer()
 
 }

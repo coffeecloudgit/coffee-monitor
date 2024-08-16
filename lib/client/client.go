@@ -66,7 +66,7 @@ func ConnectServer() {
 			for {
 				select {
 				case <-t.C:
-					err := wsClient.SendTextMessage("hello")
+					err := wsClient.SendTextMessage(PingJson)
 					if err == CloseErr {
 						return
 					}
