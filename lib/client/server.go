@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"log/slog"
 	"net/http"
 
 	"github.com/gorilla/websocket"
@@ -47,7 +48,7 @@ func echo(w http.ResponseWriter, r *http.Request) {
 			var msg Message
 			err2 := json.Unmarshal(message, &msg)
 
-			log.Logger.Info("msg: %v", msg)
+			log.Logger.Info("msg:", slog.String("data", string(message)))
 
 			if err2 != nil {
 				log.Logger.Info(err2.Error())

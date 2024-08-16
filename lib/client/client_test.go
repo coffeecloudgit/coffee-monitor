@@ -1,6 +1,7 @@
 package client
 
 import (
+	_ "coffee-monitor/lib/log"
 	"coffee-monitor/lib/util"
 	"fmt"
 	"testing"

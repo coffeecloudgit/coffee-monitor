@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"flag"
+	"log/slog"
 	"strings"
 	"sync"
 	"time"
@@ -58,7 +59,7 @@ func ConnectServer() {
 	//})
 	// 设置回调处理
 	wsClient.OnConnected(func() {
-		log.Logger.Info("OnConnected: ", wsClient.WebSocket.Url)
+		log.Logger.Info("OnConnected: ", slog.String("url", wsClient.WebSocket.Url))
 		// 连接成功后，测试每10秒发送消息
 		go func() {
 			t := time.NewTicker(20 * time.Second)
@@ -74,35 +75,35 @@ func ConnectServer() {
 		}()
 	})
 	wsClient.OnConnectError(func(err error) {
-		log.Logger.Info("OnConnectError: ", err.Error())
+		log.Logger.Info("OnConnectError: ", slog.String("error", err.Error()))
 	})
 	wsClient.OnDisconnected(func(err error) {
-		log.Logger.Info("OnDisconnected: ", err.Error())
+		log.Logger.Info("OnDisconnected: %s", slog.String("error", err.Error()))
 	})
 	wsClient.OnClose(func(code int, text string) {
-		log.Logger.Info("OnClose: ", code, text)
+		log.Logger.Info("OnClose: ", slog.Int("code", code), slog.String("text", text))
 		done <- true
 	})
 	//wsClient.OnTextMessageSent(func(message string) {
 	//	//log.Logger.Info("OnTextMessageSent: ", message)
 	//})
 	wsClient.OnBinaryMessageSent(func(data []byte) {
-		log.Logger.Info("OnBinaryMessageSent: ", string(data))
+		log.Logger.Info("OnBinaryMessageSent: ", slog.String("data", string(data)))
 	})
 	wsClient.OnSentError(func(err error) {
-		log.Logger.Info("OnSentError: ", err.Error())
+		log.Logger.Info("OnSentError:", slog.String("error", err.Error()))
 	})
 	wsClient.OnPingReceived(func(appData string) {
-		log.Logger.Info("OnPingReceived: ", appData)
+		log.Logger.Info("OnPingReceived: ", slog.String("data", appData))
 	})
 	wsClient.OnPongReceived(func(appData string) {
-		log.Logger.Info("OnPongReceived: ", appData)
+		log.Logger.Info("OnPongReceived: ", slog.String("data", appData))
 	})
 	wsClient.OnTextMessageReceived(func(message string) {
-		log.Logger.Info("OnTextMessageReceived: ", message)
+		log.Logger.Info("OnTextMessageReceived:", slog.String("message", message))
 	})
 	wsClient.OnBinaryMessageReceived(func(data []byte) {
-		log.Logger.Info("OnBinaryMessageReceived: ", string(data))
+		log.Logger.Info("OnBinaryMessageReceived: ", slog.String("data", string(data)))
 	})
 	// 开始连接
 	wsClient.Connect()
