@@ -146,7 +146,7 @@ func LotusMinerInfoCron() error {
 		//time.Sleep(2000 * time.Millisecond)
 		err2 := client.SendMessage(msg)
 		if err2 != nil {
-			log.Logger.Info(err.Error())
+			log.Logger.Info(err2.Error())
 			return
 		}
 

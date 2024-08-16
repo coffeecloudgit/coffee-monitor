@@ -100,7 +100,7 @@ func ConnectServer() {
 		log.Logger.Info("OnPongReceived: ", slog.String("data", appData))
 	})
 	wsClient.OnTextMessageReceived(func(message string) {
-		log.Logger.Info("OnTextMessageReceived:", slog.String("message", message))
+		log.Logger.Debug("OnTextMessageReceived:", slog.String("message", message))
 	})
 	wsClient.OnBinaryMessageReceived(func(data []byte) {
 		log.Logger.Info("OnBinaryMessageReceived: ", slog.String("data", string(data)))

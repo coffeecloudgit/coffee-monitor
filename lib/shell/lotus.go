@@ -34,9 +34,9 @@ func LotusSyncCheck() error {
 		execTimes++
 		return nil
 	}
-	fmt.Println("out string is:")
-	fmt.Println(outString)
-	fmt.Println("节点同步异常，需要添加内部节点！")
+	//fmt.Println("out string is:")
+	log.Logger.Error("out string", "string:", outString)
+	log.Logger.Error("节点同步异常，需要添加内部节点！")
 	return LotusNetAddPeer()
 }
 
@@ -52,7 +52,7 @@ func LotusNetAddPeer() error {
 			continue
 		}
 		cmd := fmt.Sprintf("timeout 12s lotus net connect %s", node)
-		log.Logger.Info("add node：", cmd)
+		log.Logger.Info("add node：", "cmd:", cmd)
 		out, err := exec.Command("bash", "-c", cmd).Output()
 		if err != nil {
 			return err
