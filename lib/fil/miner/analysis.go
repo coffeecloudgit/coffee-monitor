@@ -16,6 +16,7 @@ import (
 	"fmt"
 	"github.com/hpcloud/tail"
 	"io"
+	"log/slog"
 	"strconv"
 	"strings"
 	"time"
@@ -268,7 +269,7 @@ func MinerLogTailProcessor() error {
 }
 
 func CheckOrphanBlock() {
-
+	log.Logger.Info("check orphan block:", slog.Int("queueLength", len(blockQueue)))
 	var deleteKeys = make([]string, 0)
 	if len(blockQueue) <= 0 {
 		return
@@ -278,7 +279,8 @@ func CheckOrphanBlock() {
 		log.Logger.Info(err.Error())
 		return
 	}
-	fmt.Println("start check orphan block, len:", len(blockQueue), ",height:", info.Height)
+	log.Logger.Info("start check orphan block, len:",
+		slog.Int("queueLength", len(blockQueue)), slog.Uint64("height", info.Height))
 	for cid, block := range blockQueue {
 		height, err2 := util.InterfaceToUnit64(block["height"])
 		if err2 != nil {

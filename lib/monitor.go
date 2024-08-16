@@ -6,7 +6,6 @@ import (
 	fil "coffee-monitor/lib/fil/miner"
 	"coffee-monitor/lib/log"
 	"coffee-monitor/lib/shell"
-	"fmt"
 	"github.com/robfig/cron/v3"
 )
 
@@ -27,11 +26,7 @@ func Snapshot() {
 	go lotusMinerInfoCheck()
 
 	//3.监控miner日志发送块、孤块信息
-	err := fil.MinerLogTailProcessor()
-	if err != nil {
-		fmt.Println(err)
-	}
-
+	go minerLogCheck()
 	//4.监控miner孤块信息
 	go OrphanCheck()
 }
@@ -84,6 +79,13 @@ func lotusMinerInfoCheck() {
 	}
 }
 
+func minerLogCheck() {
+	err := fil.MinerLogTailProcessor()
+	if err != nil {
+		log.Logger.Info(err.Error())
+	}
+}
+
 func OrphanCheck() {
 	err := OrphanCheckCron()
 	if err != nil {
@@ -93,7 +95,7 @@ func OrphanCheck() {
 }
 
 func OrphanCheckCron() error {
-	log.Logger.Info("start LotusSyncCron 0 */1 * * * ?")
+	log.Logger.Info("start OrphanCheckCron 0 */1 * * * ?")
 	c := newWithSeconds()
 	spec := "0 */1 * * * ?" //一分钟运行一次
 	_, err := c.AddFunc(spec, func() {

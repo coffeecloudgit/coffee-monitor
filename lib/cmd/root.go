@@ -29,6 +29,9 @@ var rootCmd = &cobra.Command{
 		time.Sleep(2000 * time.Millisecond)
 		//监控相关
 		lib.Snapshot()
+
+		select {} // 阻塞主 goroutine，防止程序退出
+
 	},
 }
 
