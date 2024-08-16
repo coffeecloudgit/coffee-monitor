@@ -288,12 +288,8 @@ func CheckOrphanBlock() {
 			continue
 		}
 
-		if (info.Height - height) < 30 { //30个确认后判断孤块
-			continue
-		}
-
 		//一次确认后发送出块信息
-		if (info.Height-height) > 1 && !block["send"].(bool) {
+		if !block["send"].(bool) && (info.Height-height) > 1 {
 			err3, reward := shell.LotusMinerInfoGetRewardForBlock(cid)
 			if err3 != nil {
 				log.Logger.Error(err3.Error())
@@ -303,6 +299,10 @@ func CheckOrphanBlock() {
 			client.SendMessage(msg)
 
 			block["send"] = true
+		}
+
+		if (info.Height - height) < 30 { //30个确认后判断孤块
+			continue
 		}
 
 		if (info.Height - height) > 2000 { //2000个确认后不能判断孤块，直接删除
