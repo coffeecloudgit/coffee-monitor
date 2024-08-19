@@ -17,21 +17,21 @@ func GetLotusInfo() (*LotusInfo, error) {
 		return nil, err
 	}
 	height := gjson.Get(chainHead.Raw, "Height").Uint()
-	log.Logger.Info("chainHead height:", height)
+	log.Logger.Info("chainHead height:", "height", height)
 
 	peers, err := NetPeers()
 	if err != nil {
 		return nil, err
 	}
 	peersArray := peers.Array()
-	log.Logger.Info("peers size:", len(peersArray))
+	log.Logger.Info("peers size:", "size", len(peersArray))
 
 	netAddrs, err := NetAddrsListen()
 	if err != nil {
 		return nil, err
 	}
 	id := gjson.Get(netAddrs.Raw, "ID").String()
-	log.Logger.Info("ID:", id)
+	log.Logger.Info("ID:", "id", id)
 
 	return &LotusInfo{Id: id, Height: height, PeersNum: len(peersArray), Ip: util.GetLocalIP(), Account: conf.Fil.Account}, nil
 }

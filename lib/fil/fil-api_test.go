@@ -2,6 +2,7 @@ package fil
 
 import (
 	"coffee-monitor/lib/log"
+	"github.com/tidwall/gjson"
 	"testing"
 )
 
@@ -53,13 +54,22 @@ func TestNetPeers(t *testing.T) {
 }
 
 func TestGetTipSetByHeight(t *testing.T) {
-	got, err := GetTipSetByHeight(uint64(3905052))
+	got, err := GetTipSetByHeight(uint64(4191604))
 	if err != nil {
 		t.Errorf("GetTipSetByHeight() error = %v", err)
 		return
 	}
 
-	log.Log.Println(got)
+	cids := got.Get("Cids").Array()
+
+	for _, cidJSON := range cids {
+		//log.Logger.Info("cid", "index", cidIndex, "val", gjson.Get(cidJSON.Raw, "/").String())
+		cid := gjson.Get(cidJSON.Raw, "/").String()
+
+		log.Logger.Info(cid)
+	}
+
+	log.Log.Println(cids)
 }
 
 func TestSyncState(t *testing.T) {

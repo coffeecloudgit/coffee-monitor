@@ -15,6 +15,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/hpcloud/tail"
+	"github.com/tidwall/gjson"
 	"io"
 	"log/slog"
 	"strconv"
@@ -309,21 +310,48 @@ func CheckOrphanBlock() {
 			deleteKeys = append(deleteKeys, cid)
 			continue
 		}
-
-		_, err := fil.GetBlock(cid)
-		if err == nil {
-			deleteKeys = append(deleteKeys, cid)
-			continue
+		parentHeight := height - 1
+		tipSet, err2 := fil.GetTipSetByHeight(parentHeight)
+		if err2 != nil {
+			log.Logger.Error("err:", "err", err, "block", block)
 		}
-		if strings.Contains(err.Error(), "ipld: could not find") { //orphan
-			fmt.Printf("fored block time:%s, cid:%s, height:%f, took:%f, parents:%v \n",
-				block["time"], block["cid"], block["height"], block["took"], block["parents"])
-			deleteKeys = append(deleteKeys, cid)
+		//log.Logger.Info("tipSet", "tipSet", tipSet)
+		cids := tipSet.Get("Cids").Array()
+		parentTipset := block["parentTipset"].(string)
+
+		orphan := false
+		for _, cidJSON := range cids {
+			//log.Logger.Info("cid", "index", cidIndex, "val", gjson.Get(cidJSON.Raw, "/").String())
+			id := gjson.Get(cidJSON.Raw, "/").String()
+
+			//log.Logger.Info(id)
+			if !strings.Contains(parentTipset, id) {
+				orphan = true
+				break
+			}
+		}
+
+		if orphan {
 			msg := client.Message{Type: client.OrphanBlock, Data: block}
 			client.SendMessage(msg)
-		} else {
-			log.Logger.Info("err:%v, %v", err, block)
 		}
+
+		deleteKeys = append(deleteKeys, cid)
+
+		//_, err := fil.GetBlock(cid)
+		//if err == nil {
+		//	deleteKeys = append(deleteKeys, cid)
+		//	continue
+		//}
+		//if strings.Contains(err.Error(), "ipld: could not find") { //orphan
+		//	fmt.Printf("fored block time:%s, cid:%s, height:%f, took:%f, parents:%v \n",
+		//		block["time"], block["cid"], block["height"], block["took"], block["parents"])
+		//	deleteKeys = append(deleteKeys, cid)
+		//	msg := client.Message{Type: client.OrphanBlock, Data: block}
+		//	client.SendMessage(msg)
+		//} else {
+		//	log.Logger.Error("err:", "err", err, "block", block)
+		//}
 	}
 
 	for _, v := range deleteKeys {
