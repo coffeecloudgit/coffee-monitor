@@ -4,6 +4,7 @@ import (
 	_ "coffee-monitor/lib/log"
 	"coffee-monitor/lib/util"
 	"fmt"
+	"runtime"
 	"testing"
 	"time"
 )
@@ -95,6 +96,10 @@ func TestSendLotusMinerInfo(t *testing.T) {
 	time.Sleep(50000 * time.Millisecond)
 	DisConnectServer()
 
+}
+
+func TestVersion(t *testing.T) {
+	fmt.Println(runtime.Version())
 }
 
 //
