@@ -18,7 +18,7 @@ const (
 )
 
 var (
-	PingJson = fmt.Sprintf("{\"type\":\"%s\", \"content\": \"%s\", \"version\": \"%s\"}", Ping, config2.CONF.Fil.Account, program.Version)
+	PingJson = fmt.Sprintf("{\"type\":\"%s\", \"content\": \"%s\", \"version\": \"%s\"}", Ping, config2.CONF.Fil.Account, &program.Version)
 )
 
 type Message struct {
