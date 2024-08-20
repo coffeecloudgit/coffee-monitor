@@ -212,10 +212,10 @@ func MinerLogTailProcessor() error {
 	//t, err := tail.TailFile(config.Logfile[0].Path, tail.Config{Follow: true})
 
 	t, err := tail.TailFile(config.Logfile[0].Path, tail.Config{
-		ReOpen:    true,                                               //是否重新打开
-		Follow:    true,                                               //是否跟随
-		Location:  &tail.SeekInfo{Offset: -10000, Whence: io.SeekEnd}, //从文件的什么地方开始读
-		MustExist: false,                                              //文件不存在不报错
+		ReOpen:    true,                                              //是否重新打开
+		Follow:    true,                                              //是否跟随
+		Location:  &tail.SeekInfo{Offset: -5000, Whence: io.SeekEnd}, //从文件的什么地方开始读
+		MustExist: false,                                             //文件不存在不报错
 		Poll:      false,
 	})
 
