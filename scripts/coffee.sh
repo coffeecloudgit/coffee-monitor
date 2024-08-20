@@ -39,10 +39,6 @@ stop(){
  echo "${APP_NAME} is not running"
  fi
 }
-
-log(){
- tail -f logs/coffee.log
-}
   
 #输出运行状态
 status(){
@@ -52,6 +48,14 @@ status(){
  else
  echo "${APP_NAME} is NOT running."
  fi
+}
+
+log(){
+ tail -f logs/coffee.log
+}
+
+build(){
+ go build -o coffee-cli
 }
   
 #重启
@@ -76,6 +80,9 @@ case "$1" in
  ;;
  "log")
  log
+ ;;
+ "build")
+ build
  ;;
  *)
  usage
