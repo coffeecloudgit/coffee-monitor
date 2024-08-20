@@ -23,7 +23,7 @@ import (
 "WinPoStProof":[{"PoStProof":3,"ProofBytes":"kpk2yIhzZr6399lcd4MlpjTFFm+Csm3wpppkoN/7bjqhg358GgJzjTyZfYXB2Ss1krvvKIpLJfAYAOhZO0BVXkf9HQkaOrntf7sAKjK6cjUcpQWmKqhQ7k66I3oHODyhFaieJLnGQEljEdBvzfffF/IjIEXIpIQEejZYZ2zhsfLQv/eqL0qJHguXeCiFbMG5rKDa1xsirZW88Aw0A7B95lpKirxvE+RzLcSdJpE9RSSvnyYtGTNDAzRsqXlUfOLG"}]}
 */
 func TestGetBlock(t *testing.T) {
-	cid := "bafy2bzacebkfx4wbywkskjfperofr7mvjudsxoisvipgsiqx6kpf6lrntwuog"
+	cid := "bafy2bzacec42da4kxjq3l5bqqvsfs5lqccvgmg3due2e4rjouv26euckmzbv2"
 	got, err := GetBlock(cid)
 	if err != nil {
 		t.Errorf("GetBlock() error = %v", err)
@@ -76,6 +76,17 @@ func TestSyncState(t *testing.T) {
 	got, err := SyncState()
 	if err != nil {
 		t.Errorf("SyncState() error = %v", err)
+		return
+	}
+
+	log.Log.Println(got)
+}
+
+func TestGetBlockMessage(t *testing.T) {
+	cid := "bafy2bzacec42da4kxjq3l5bqqvsfs5lqccvgmg3due2e4rjouv26euckmzbv2"
+	got, err := GetBlockMessage(cid)
+	if err != nil {
+		t.Errorf("GetBlockMessage() error = %v", err)
 		return
 	}
 

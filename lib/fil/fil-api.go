@@ -29,6 +29,18 @@ func GetBlock(cid string) (*gjson.Result, error) {
 	return result, nil
 }
 
+func GetBlockMessage(cid string) (*gjson.Result, error) {
+	callMsg := map[string]interface{}{
+		"/": cid,
+	}
+	params := []interface{}{callMsg}
+	result, err := walletClient.Call("Filecoin.ChainGetBlockMessages", params)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func GetTipSetByHeight(height uint64) (*gjson.Result, error) {
 	params := []interface{}{height, nil}
 

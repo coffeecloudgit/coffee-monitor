@@ -8,7 +8,7 @@ import (
 
 func StringToUint64(data string) (uint64, error) {
 	if n, err := strconv.ParseUint(data, 10, 64); err == nil {
-		fmt.Println("解析字符串转换成功:", n)
+		//fmt.Println("解析字符串转换成功:", n)
 		return n, nil
 	} else {
 		fmt.Println("转换失败:", err)
@@ -18,7 +18,7 @@ func StringToUint64(data string) (uint64, error) {
 
 func InterfaceToUint64(data interface{}) (uint64, error) {
 	if num, ok := data.(uint64); ok {
-		fmt.Println("转换成功:", num)
+		//fmt.Println("转换成功:", num)
 		return num, nil
 	} else if fNum, ok := data.(float64); ok {
 		sNum := strconv.FormatFloat(fNum, 'f', 0, 64)
