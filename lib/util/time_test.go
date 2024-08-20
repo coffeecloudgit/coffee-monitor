@@ -19,3 +19,17 @@ func TestStringToTime(t *testing.T) {
 
 	fmt.Println(secondSub)
 }
+
+func TestStringToTime2(t *testing.T) {
+	timeString := "2024-07-23T18:32:40.022Z"
+	myTime, err := StringToTime(timeString)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println(myTime)
+	secondSub := time.Now().Unix() - myTime.Unix()
+
+	fmt.Println(secondSub)
+}
