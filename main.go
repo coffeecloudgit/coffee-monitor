@@ -3,12 +3,14 @@ package main
 import (
 	"coffee-monitor/lib/cmd"
 	"coffee-monitor/lib/log"
+	"coffee-monitor/lib/program"
 )
 
 var Version = "unknown"
 
 // 主程序
 func main() {
+	program.Version = Version
 	log.Logger.Info("Program info", "version", Version)
 	//启动命令行
 	cmd.Execute()

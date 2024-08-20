@@ -2,8 +2,8 @@ package client
 
 import (
 	config2 "coffee-monitor/lib/config"
+	"coffee-monitor/lib/program"
 	"fmt"
-	"runtime"
 )
 
 type MsgType string
@@ -18,7 +18,7 @@ const (
 )
 
 var (
-	PingJson = fmt.Sprintf("{\"type\":\"%s\", \"content\": \"%s\", \"version\": \"%s\"}", Ping, config2.CONF.Fil.Account, runtime.Version())
+	PingJson = fmt.Sprintf("{\"type\":\"%s\", \"content\": \"%s\", \"version\": \"%s\"}", Ping, config2.CONF.Fil.Account, program.Version)
 )
 
 type Message struct {
