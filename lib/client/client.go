@@ -3,9 +3,11 @@ package client
 import (
 	"coffee-monitor/lib/config"
 	"coffee-monitor/lib/log"
+	"coffee-monitor/lib/program"
 	"encoding/json"
 	"errors"
 	"flag"
+	"fmt"
 	"log/slog"
 	"strings"
 	"sync"
@@ -63,10 +65,11 @@ func ConnectServer() {
 		// 连接成功后，测试每10秒发送消息
 		go func() {
 			t := time.NewTicker(20 * time.Second)
+			pingJson := fmt.Sprintf(PingJson, Ping, config.CONF.Fil.Account, program.Version)
 			for {
 				select {
 				case <-t.C:
-					err := wsClient.SendTextMessage(PingJson)
+					err := wsClient.SendTextMessage(pingJson)
 					if err == CloseErr {
 						return
 					}
