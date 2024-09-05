@@ -291,9 +291,12 @@ func CheckOrphanBlock() {
 
 		//一次确认后发送出块信息
 		if !block["send"].(bool) && (info.Height-height) > 1 {
+			log.Logger.Info("new block send, len:", slog.Int("queueLength", len(blockQueue)),
+				slog.Uint64("info height", info.Height), slog.Uint64("height", height))
 			err3, reward := shell.LotusMinerInfoGetRewardForBlock(cid)
 			if err3 != nil {
 				log.Logger.Error(err3.Error())
+				continue
 			}
 			block["reward"] = reward
 			msg := client.Message{Type: client.NewBlock, Data: block}
