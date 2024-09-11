@@ -2,7 +2,7 @@
 
 #使用说明，用来提示输入参数
 usage() {
- echo "Usage: bash auto-disk.sh [batchMount]"
+ echo "Usage: bash auto-disk.sh [batchMount|saveSerial]"
  exit 1
 }
 
