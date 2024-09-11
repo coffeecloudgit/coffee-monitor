@@ -41,10 +41,29 @@ batchMount(){
 
 }
 
+saveSerial(){
+
+  # 定义时间变量名和显示时间格式
+  fileNameDate=$(date +%Y%m%d-%H%M%S)
+  fileName=/mnt/"disk-info-${fileNameDate}".txt
+  echo "硬盘 挂载目录  硬盘序列号" >>"${fileName}"
+
+  for disk in $(parted -l |grep 'Disk /dev/sd' |grep Disk |grep TB |awk '{split($2,s,":"); print s[1]}')
+  do
+    serial=$(lsblk --nodeps -no serial "$disk")
+    dirName=${disk:5}
+    echo "$disk /mnt/${dirName}  $serial" >>"${fileName}"
+  done
+  echo "Save Serial success!"
+}
+
 #根据输入参数，选择执行对应方法，不输入则执行使用说明
 case "$1" in
  "batchMount")
  batchMount
+ ;;
+ "saveSerial")
+ saveSerial
  ;;
  *)
  usage
