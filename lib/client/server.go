@@ -90,7 +90,7 @@ func processMsg(msg *Message) {
 	case OrphanBlock:
 	case LotusMinerInfo:
 	case NewMineOne:
-
+	case SectorsExpireInfo:
 	default:
 		fmt.Println("未知消息：", msg)
 	}
