@@ -4,6 +4,7 @@ import (
 	"coffee-monitor/lib/client"
 	config2 "coffee-monitor/lib/config"
 	fil "coffee-monitor/lib/fil/miner"
+	"coffee-monitor/lib/fil/sectors"
 	"coffee-monitor/lib/log"
 	"coffee-monitor/lib/shell"
 	"github.com/robfig/cron/v3"
@@ -29,6 +30,8 @@ func Snapshot() {
 	go minerLogCheck()
 	//4.监控miner孤块信息
 	go OrphanCheck()
+	//5.发送扇区数据
+	go SectorsExpireInfo()
 }
 
 // Snapshot 快照一次
@@ -153,6 +156,36 @@ func LotusMinerInfoCron() error {
 	})
 	if err != nil {
 		return err
+	}
+	c.Start()
+	select {}
+
+}
+
+func SectorsExpireInfo() {
+	err := SectorsExpireInfoCron()
+	if err != nil {
+		log.Logger.Info(err.Error())
+		return
+	}
+}
+
+func SectorsExpireInfoCron() error {
+	err := sectors.SendSectorsExpireInfo()
+	if err != nil {
+		return err
+	}
+	log.Logger.Info("start SectorsExpireInfoCron * 12 * * *")
+	c := cron.New()
+	spec := "* 12 * * *" //12小时运行一次
+	_, err2 := c.AddFunc(spec, func() {
+		err3 := sectors.SendSectorsExpireInfo()
+		if err3 != nil {
+			return
+		}
+	})
+	if err2 != nil {
+		return err2
 	}
 	c.Start()
 	select {}

@@ -14,11 +14,11 @@ batchMount(){
     #4.对磁盘/dev/sd*进行分区
     parted -s "$disk" mklabel gpt
     #5.对磁盘/dev/sd* 指定分区类型和容量占比
-    parted -s "$disk" mkpart primary 1 100%
+    parted -s "$disk" mkpart primary 0 100%
     #6.格式化磁盘/dev/sd*
     mkfs.xfs -f "${disk}"1
-    echo "/n/n****************$disk parted was Finished! Waiting For 2 second****/n/n"
-    sleep 2s
+    echo "/n/n****************$disk parted was Finished! Waiting For 1 second****/n/n"
+    sleep 1s
     #7.创建对应磁盘个数的目录，/hadoop*,创建挂载点
     mkdir -p /mnt/"${dirName}"
     #9.通过blk id命令查看磁盘的uuid，获取uuid值
@@ -35,6 +35,8 @@ batchMount(){
   if [ "$batchSuccess" == true ]; then
     mount -a
     echo "Batch mount success!"
+    #保存硬盘序列号
+    saveSerial
   else
     echo "Batch mount fail!"
   fi
@@ -42,7 +44,6 @@ batchMount(){
 }
 
 saveSerial(){
-
   # 定义时间变量名和显示时间格式
   fileNameDate=$(date +%Y%m%d-%H%M%S)
   fileName=/mnt/"disk-info-${fileNameDate}".txt

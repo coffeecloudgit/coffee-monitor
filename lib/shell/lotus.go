@@ -88,6 +88,19 @@ func LotusMinerInfoGetRewardForBlock(blockId string) (error, string) {
 	return fmt.Errorf("error out: %s", result), "0 FIL"
 }
 
+func GenerateLotusMinerSectorsFile() (error, string) {
+	config := config2.CONF
+	if len(config.Fil.Sectors) == 0 {
+		return errors.New("sectors file is empty"), ""
+	}
+	command := fmt.Sprintf("timeout 180s lotus-miner sectors list >%s", config.Fil.Sectors)
+	out, err := exec.Command("bash", "-c", command).Output()
+	if err != nil {
+		return err, ""
+	}
+	return nil, string(out)
+}
+
 //try:
 //out = sp.getoutput("timeout 36s lotus sync wait")
 //print("chain_check:")

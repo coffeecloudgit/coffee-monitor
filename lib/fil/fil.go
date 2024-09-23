@@ -9,6 +9,12 @@ import (
 	"github.com/tidwall/gjson"
 )
 
+//func GetChainHead() (*LotusInfo, error) {
+//	ApiInit()
+//	conf := config.CONF
+//	chainHead, err := GetChainHead()
+//}
+
 func GetLotusInfo() (*LotusInfo, error) {
 	ApiInit()
 	conf := config.CONF

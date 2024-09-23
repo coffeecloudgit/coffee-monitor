@@ -31,6 +31,7 @@ type Conf struct {
 		Debug     bool   `yaml:"debug"`
 		Account   string `yaml:"account"`
 		MsgServer string `yaml:"msg_server"`
+		Sectors   string `yaml:"sectors"`
 	} `yaml:"fil"`
 	Lotus struct {
 		Nodes []string
