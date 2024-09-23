@@ -5,8 +5,8 @@ import (
 	config2 "coffee-monitor/lib/config"
 	"coffee-monitor/lib/fil"
 	"coffee-monitor/lib/log"
+	"coffee-monitor/lib/shell"
 	"coffee-monitor/lib/util"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/hpcloud/tail"
@@ -32,11 +32,11 @@ func SendSectorsExpireInfo() error {
 	minerSectors["sectors"] = sectorsInfo
 
 	msg := client.Message{Type: client.SectorsExpireInfo, Data: minerSectors}
-	msgBytes, err := json.Marshal(msg)
-	if err != nil {
-		return errors.New("message marshal fail")
-	}
-	fmt.Println(string(msgBytes))
+	//msgBytes, err := json.Marshal(msg)
+	//if err != nil {
+	//	return errors.New("message marshal fail")
+	//}
+	//fmt.Println(string(msgBytes))
 	//time.Sleep(2000 * time.Millisecond)
 	err2 := client.SendMessage(msg)
 	if err2 != nil {
@@ -48,10 +48,10 @@ func SendSectorsExpireInfo() error {
 }
 
 func GetSectorsExpireInfo() (error, []*client.ExpireSameDaySectors, uint64) {
-	//err, _ := shell.GenerateLotusMinerSectorsFile()
-	//if err != nil {
-	//	return err, nil, 0
-	//}
+	err, _ := shell.GenerateLotusMinerSectorsFile()
+	if err != nil {
+		return err, nil, 0
+	}
 	return SectorFileProcessor()
 }
 
