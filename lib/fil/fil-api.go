@@ -6,6 +6,10 @@ import (
 	"github.com/tidwall/gjson"
 )
 
+func init() {
+	ApiInit()
+}
+
 var walletClient = fil_rpc.Client{BaseURL: "https://api.node.glif.io/rpc/v0", Debug: true}
 
 func ApiInit() {
