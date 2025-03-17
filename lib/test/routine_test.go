@@ -60,3 +60,18 @@ func Test04(t *testing.T) {
 	fmt.Println("Original Slice:", originalSlice)
 	fmt.Println("Sub Slice:", subSlice)
 }
+
+func Test05(t *testing.T) {
+	// 原始切片
+	originalSlice := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+
+	// 截取切片的起始索引和结束索引
+	start := 3
+	end := 7
+
+	// 截取切片
+	subSlice := originalSlice[start:end]
+
+	fmt.Println("Original Slice:", originalSlice)
+	fmt.Println("Sub Slice:", subSlice)
+}
