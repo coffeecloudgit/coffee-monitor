@@ -106,7 +106,7 @@ func LotusMinerInfoGetRewardForLastBlocks() (error, map[string]string) {
 		return err, rewardMap
 	}
 	result := string(out)
-	log.Logger.Info("result:", "lines:", result)
+	//log.Logger.Info("result:", "lines:", result)
 	lines := strings.Split(result, "\n")
 	for _, line := range lines {
 		if strings.Contains(line, "|") {
