@@ -307,7 +307,7 @@ func CheckOrphanBlock() {
 
 			reward, ok := rewardMap[cid]
 			if ok {
-				log.Logger.Error("reward not found", "cid:", cid)
+				log.Logger.Info("reward found", "cid:", cid, "reward:", reward)
 				//continue
 				block["reward"] = reward
 				msg := client.Message{Type: client.NewBlock, Data: block}
