@@ -100,7 +100,7 @@ timeout 36s lotus-miner info --blocks 2 |grep "|"
 */
 func LotusMinerInfoGetRewardForLastBlocks() (error, map[string]string) {
 	rewardMap := make(map[string]string)
-	cmd := fmt.Sprintf("timeout 36s lotus-miner info --blocks 6 |grep %s", "|")
+	cmd := fmt.Sprintf("timeout 36s lotus-miner info --blocks 6 |grep \"%s\"", "|")
 	out, err := exec.Command("bash", "-c", cmd).Output()
 	if err != nil {
 		return err, rewardMap
