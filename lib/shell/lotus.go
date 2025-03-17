@@ -88,6 +88,38 @@ func LotusMinerInfoGetRewardForBlock(blockId string) (error, string) {
 	return fmt.Errorf("error out: %s", result), "0 FIL"
 }
 
+/*
+*
+timeout 36s lotus-miner info --blocks 2 |grep "|"
+
+	Epoch   | Block ID                                                       | Reward
+	4795574 | bafy2bzacedcbpl3euk443e3kewu6nd6e4xituhm7m5xfskj4dz3qnegl5txoo | 6.072002358920002932 FIL
+	4795438 | bafy2bzaceb3yzpiu7pzoswhw3tcbwu5r7f2mfqm4xy23htnpexvuq6fvfx5xg | 6.072055146770326789 FIL
+
+*
+*/
+func LotusMinerInfoGetRewardForLastBlocks() (error, map[string]string) {
+	rewardMap := make(map[string]string)
+	cmd := fmt.Sprintf("timeout 36s lotus-miner info --blocks 6 |grep %s", "|")
+	out, err := exec.Command("bash", "-c", cmd).Output()
+	if err != nil {
+		return err, rewardMap
+	}
+	result := string(out)
+	log.Logger.Info("result:", "lines:", result)
+	lines := strings.Split(result, "\n")
+	for _, line := range lines {
+		if strings.Contains(line, "|") {
+			resultArray := strings.Split(line, "|")
+			if len(resultArray) == 3 {
+				rewardMap[strings.TrimSpace(resultArray[1])] = strings.TrimSpace(resultArray[2])
+			}
+		}
+	}
+	log.Logger.Info("rewardMap:", "map:", rewardMap)
+	return nil, rewardMap
+}
+
 func GenerateLotusMinerSectorsFile() (error, string) {
 	config := config2.CONF
 	if len(config.Fil.Sectors) == 0 {

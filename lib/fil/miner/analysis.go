@@ -14,13 +14,14 @@ import (
 	"coffee-monitor/lib/util"
 	"errors"
 	"fmt"
-	"github.com/hpcloud/tail"
-	"github.com/tidwall/gjson"
 	"io"
 	"log/slog"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/hpcloud/tail"
+	"github.com/tidwall/gjson"
 )
 
 // LogAnalysis 匹配关键词
@@ -282,6 +283,11 @@ func CheckOrphanBlock() {
 	}
 	log.Logger.Info("start check orphan block, len:",
 		slog.Int("queueLength", len(blockQueue)), slog.Uint64("height", info.Height))
+
+	err, rewardMap := shell.LotusMinerInfoGetRewardForLastBlocks()
+	if err != nil {
+		log.Logger.Error(err.Error())
+	}
 	for cid, block := range blockQueue {
 		height, err2 := util.InterfaceToUint64(block["height"])
 		if err2 != nil {
@@ -293,16 +299,22 @@ func CheckOrphanBlock() {
 		if !block["send"].(bool) && (info.Height-height) > 1 {
 			log.Logger.Info("new block send, len:", slog.Int("queueLength", len(blockQueue)),
 				slog.Uint64("info height", info.Height), slog.Uint64("height", height))
-			err3, reward := shell.LotusMinerInfoGetRewardForBlock(cid)
-			if err3 != nil {
-				log.Logger.Error(err3.Error())
-				continue
-			}
-			block["reward"] = reward
-			msg := client.Message{Type: client.NewBlock, Data: block}
-			client.SendMessage(msg)
+			// err3, reward := shell.LotusMinerInfoGetRewardForBlock(cid)
+			// if err3 != nil {
+			// 	log.Logger.Error(err3.Error())
+			// 	continue
+			// }
 
-			block["send"] = true
+			reward, ok := rewardMap[cid]
+			if ok {
+				log.Logger.Error("reward not found", "cid:", cid)
+				//continue
+				block["reward"] = reward
+				msg := client.Message{Type: client.NewBlock, Data: block}
+				client.SendMessage(msg)
+				block["send"] = true
+			}
+
 		}
 
 		if (info.Height - height) < 30 { //30个确认后判断孤块
@@ -341,20 +353,6 @@ func CheckOrphanBlock() {
 
 		deleteKeys = append(deleteKeys, cid)
 
-		//_, err := fil.GetBlock(cid)
-		//if err == nil {
-		//	deleteKeys = append(deleteKeys, cid)
-		//	continue
-		//}
-		//if strings.Contains(err.Error(), "ipld: could not find") { //orphan
-		//	fmt.Printf("fored block time:%s, cid:%s, height:%f, took:%f, parents:%v \n",
-		//		block["time"], block["cid"], block["height"], block["took"], block["parents"])
-		//	deleteKeys = append(deleteKeys, cid)
-		//	msg := client.Message{Type: client.OrphanBlock, Data: block}
-		//	client.SendMessage(msg)
-		//} else {
-		//	log.Logger.Error("err:", "err", err, "block", block)
-		//}
 	}
 
 	for _, v := range deleteKeys {
