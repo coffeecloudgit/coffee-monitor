@@ -7,6 +7,7 @@ import (
 	"coffee-monitor/lib/fil/sectors"
 	"coffee-monitor/lib/log"
 	"coffee-monitor/lib/shell"
+
 	"github.com/robfig/cron/v3"
 )
 
@@ -175,9 +176,14 @@ func SectorsExpireInfoCron() error {
 	if err != nil {
 		return err
 	}
-	log.Logger.Info("start SectorsExpireInfoCron * 12 * * *")
+	// 从配置文件获取扇区过期检查时间
+	config := config2.CONF
+	spec := config.Cron.SectorsExpire
+	if spec == "" {
+		spec = "0 3 * * *" // 如果配置为空，默认每天3点运行一次
+	}
+	log.Logger.Info("start SectorsExpireInfoCron " + spec)
 	c := cron.New()
-	spec := "* 12 * * *" //12小时运行一次
 	_, err2 := c.AddFunc(spec, func() {
 		err3 := sectors.SendSectorsExpireInfo()
 		if err3 != nil {

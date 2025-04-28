@@ -6,8 +6,9 @@ package config
 import (
 	"coffee-monitor/lib/log"
 	"fmt"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
+
+	"gopkg.in/yaml.v2"
 )
 
 var CONF *Conf
@@ -36,6 +37,9 @@ type Conf struct {
 	Lotus struct {
 		Nodes []string
 	}
+	Cron struct {
+		SectorsExpire string `yaml:"sectors_expire"` // 扇区过期信息检查时间
+	} `yaml:"cron"`
 }
 
 // 获取配置
