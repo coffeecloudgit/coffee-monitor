@@ -91,6 +91,10 @@ func ReadNewMineOneFromLine(content string) (map[string]interface{}, error) {
 		return nil, err
 	}
 
+	if timeIndex == -1 {
+		timeIndex = strings.Index(content, "\tWARN\tminer")
+	}
+
 	if timeIndex > -1 {
 		timeString = content[:timeIndex]
 		mineOne["time"] = timeString
